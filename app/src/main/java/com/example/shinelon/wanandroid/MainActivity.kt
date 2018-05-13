@@ -2,38 +2,49 @@ package com.example.shinelon.wanandroid
 
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.NavigationView
 import android.support.v4.view.MenuItemCompat
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
+import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_toolbar.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListener {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {
-                message.setText(R.string.title_home)
-                return@OnNavigationItemSelectedListener true
+
             }
             R.id.navigation_dashboard -> {
-                message.setText(R.string.title_dashboard)
-                return@OnNavigationItemSelectedListener true
+
             }
             R.id.navigation_notifications -> {
-                message.setText(R.string.title_notifications)
-                return@OnNavigationItemSelectedListener true
+
             }
         }
         false
     }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_base)
+        setSupportActionBar(toolbar_base)
 
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        val toggle =ActionBarDrawerToggle(this,drawer_layout,toolbar_base,R.string.open_navigation,R.string.close_navigation)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navigation_view.setNavigationItemSelectedListener(this)
+        navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,4 +68,7 @@ class MainActivity : AppCompatActivity() {
 
         return super.onOptionsItemSelected(item)
     }
+
+
 }
+

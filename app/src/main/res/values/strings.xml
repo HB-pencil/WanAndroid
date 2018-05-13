@@ -1,6 +1,10 @@
 <resources>
+    <string name="open_navigation">Open Drawer</string>
+    <string name="close_navigation">Close Drawer</string>
+
     <string name="app_name">WanAndroid</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
 </resources>
