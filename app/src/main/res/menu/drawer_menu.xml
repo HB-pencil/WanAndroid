@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="收藏文章"
+        android:id="@+id/panel_collect_art"
+        android:icon="@drawable/pic_collect_art"/>
+    <item android:title="收藏网站"
+        android:id="@+id/panel_love_web"
+        android:icon="@drawable/pic_love_web"/>
+    <item android:title="夜间模式"
+        android:id="@+id/panel_night_mode"
+        android:icon="@drawable/pic_night_mode"/>
+    <item android:title="我的设置"
+        android:id="@+id/panel_setting"
+        android:icon="@drawable/pic_setting"/>
 </menu>

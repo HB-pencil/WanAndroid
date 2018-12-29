@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/general">
+      <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:layout_centerInParent="true">
+          <android.support.design.widget.TextInputLayout
+              android:layout_width="250dp"
+              android:layout_height="wrap_content">
+              <android.support.design.widget.TextInputEditText
+                  android:id="@+id/username"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:hint="@string/username"/>
+          </android.support.design.widget.TextInputLayout>
+          <android.support.design.widget.TextInputLayout
+              android:layout_width="250dp"
+              android:layout_height="wrap_content">
+              <android.support.design.widget.TextInputEditText
+                  android:id="@+id/password"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:hint="@string/password"/>
+          </android.support.design.widget.TextInputLayout>
+          <Button
+              android:id="@+id/login_btn"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/user_login"
+              android:background="@drawable/ripple"
+              android:layout_marginTop="5dp"/>
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:layout_marginTop="10dp">
+              <CheckBox
+                  android:id="@+id/remember"
+                  android:layout_width="0dp"
+                  android:layout_weight="1"
+                  android:layout_height="wrap_content"
+                  android:text="@string/remember_password"/>
+              <TextView
+                  android:id="@+id/register_tv"
+                  android:layout_width="0dp"
+                  android:layout_weight="1"
+                  android:layout_height="wrap_content"
+                  android:gravity="end"
+                  android:text="@string/register"
+                  android:textSize="15sp"/>
+          </LinearLayout>
+      </LinearLayout>
+</RelativeLayout>

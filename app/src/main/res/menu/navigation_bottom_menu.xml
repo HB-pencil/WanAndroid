@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_home" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_dashboard" />
-
-    <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_notifications" />
-
+    <item android:id="@+id/btn_home"
+        android:enabled="true"
+        android:icon="@drawable/pic_home"
+        android:title="@string/title_home"
+        app:showAsAction="always"/>
+    <item android:id="@+id/btn_struct"
+        android:enabled="true"
+        android:icon="@drawable/pic_struct"
+        android:title="@string/title_struct"
+        app:showAsAction="always"/>
+    <item android:id="@+id/btn_project"
+        android:enabled="true"
+        android:icon="@drawable/pic_project"
+        android:title="@string/title_project"
+        app:showAsAction="always"/>
+    <item android:id="@+id/btn_nav"
+        android:enabled="true"
+        android:icon="@drawable/pic_navigate"
+        android:title="@string/title_navigate"
+        app:showAsAction="always"/>
 </menu>

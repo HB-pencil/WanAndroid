@@ -27,11 +27,12 @@
         style="@style/Widget.Design.BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/general"
+        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        app:itemIconTint="@color/colorPrimary"
-        app:itemTextColor="@color/black"
+        app:itemTextColor="@drawable/btn_selector"
+        app:itemIconTint="@drawable/btn_selector"
         app:elevation="16dp"
-        app:layout_behavior="com.example.shinelon.wanandroid.helper.MyBehabvior"
+        app:layout_behavior="com.example.shinelon.wanandroid.helper.MyBehavior"
         app:menu="@menu/navigation_bottom_menu" />
 </android.support.design.widget.CoordinatorLayout>

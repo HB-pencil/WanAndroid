@@ -4,10 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
      <item android:id="@+id/search"
          android:title="搜索"
-         app:actionProviderClass="android.support.v7.widget.SearchView"
+         android:icon="@drawable/pic_search"
          app:showAsAction="always"/>
-     <item android:id="@+id/add"
-         android:title="常用网站"
-         android:icon="@color/colorPrimary"
-         app:showAsAction="ifRoom|withText"/>
 </menu>

@@ -9,29 +9,50 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
+import com.example.shinelon.wanandroid.helper.NavigationViewhelper
+import com.example.shinelon.wanandroid.presenter.MainActivityPresenter
+import com.example.shinelon.wanandroid.viewimp.IMainActivityView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 
-class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListener {
+class MainActivityImpl: AppCompatActivity(),IMainActivityView,NavigationView.OnNavigationItemSelectedListener {
+    var presenter: MainActivityPresenter? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.navigation_home -> {
+            R.id.btn_home -> {
 
             }
-            R.id.navigation_dashboard -> {
+            R.id.btn_struct -> {
 
             }
-            R.id.navigation_notifications -> {
+            R.id.btn_project -> {
+
+            }
+            R.id.btn_nav -> {
 
             }
         }
-        false
+        true
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        when (item.itemId) {
+            R.id.panel_collect_art -> {
+
+            }
+            R.id.panel_love_web -> {
+
+            }
+            R.id.panel_night_mode -> {
+
+            }
+            R.id.panel_setting -> {
+
+            }
+        }
+        return false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,32 +64,22 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
+        if (presenter == null ) setPresenter()
+
         navigation_view.setNavigationItemSelectedListener(this)
+
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        NavigationViewhelper.disableShiftMode(navigation_bottom)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_main_menu,menu)
-        val itemSearch = menu?.findItem(R.id.search)
-        val serach = itemSearch?.actionView as SearchView
-        serach.isSubmitButtonEnabled = true
-        serach.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-
-        return super.onOptionsItemSelected(item)
+    override fun setPresenter() {
+        presenter = MainActivityPresenter()
+        presenter?.addView(this)
     }
-
-
 }
 
