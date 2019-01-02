@@ -1,7 +1,11 @@
 package com.example.shinelon.wanandroid
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.CompoundButton
 import com.example.shinelon.wanandroid.helper.toast
 import com.example.shinelon.wanandroid.presenter.LoginActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.ILoginActivityView
@@ -9,12 +13,20 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivityImpl:AppCompatActivity(),ILoginActivityView {
     var presenter: LoginActivityPresenter? = null
+    val TAG = "LoginActivityImpl"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         if(presenter == null) setPresenter()
         login_btn.setOnClickListener {
             presenter!!.login()
+        }
+
+        remember_cb.setOnCheckedChangeListener{
+            _, isChecked -> presenter?.saveAutoLoginState(isChecked)
+        }
+        register_tv.setOnClickListener {
+            //TODO
         }
     }
 

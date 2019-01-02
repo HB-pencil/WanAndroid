@@ -2,10 +2,8 @@ package com.example.shinelon.wanandroid.networkimp
 
 import com.example.shinelon.wanandroid.model.firstpage.LoginRsp
 import io.reactivex.Observable
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.Response
+import retrofit2.http.*
 
 interface LogInOutRetrofit {
     /**
@@ -17,8 +15,17 @@ interface LogInOutRetrofit {
      */
     @POST("/user/login")
     @FormUrlEncoded
-    fun login(@Field("username") username: String?,@Field("password") password: String?): Observable<LoginRsp>
+    fun login(@Field("username") username: String?,@Field("password") password: String?): Observable<Response<LoginRsp>>
 
+    /**
+     * 如果存在cookie,触发自动登录
+     */
+    @GET("")
+    fun checkAutoLogin(@Header("cookie") cookie: String)
+
+    /**
+     * 注册新用户
+     */
     @POST("/user/register")
     @FormUrlEncoded
     fun register(@Field("username") username: String,@Field("password") password: String,

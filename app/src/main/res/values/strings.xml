@@ -13,6 +13,6 @@
     <string name="username">用户名：</string>
     <string name="password">密码：</string>
     <string name="register">注册</string>
-    <string name="remember_password">自动登录
-    </string>
+    <string name="remember_password">自动登录</string>
+    <string name="unknown_user">未登录用户</string>
 </resources>

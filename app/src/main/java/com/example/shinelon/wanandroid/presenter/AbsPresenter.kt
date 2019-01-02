@@ -11,4 +11,6 @@ abstract class AbsPresenter<IView>{
      */
     abstract fun addView(view: IView)
     abstract fun jumpToTarget()
+
+    open fun checkPermissions(permissions: Array<String>){}
 }
