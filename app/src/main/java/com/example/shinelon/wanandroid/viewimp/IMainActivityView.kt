@@ -5,4 +5,6 @@ package com.example.shinelon.wanandroid.viewimp
  */
 interface IMainActivityView: IView {
     fun updateHeaderView(isOnline: Boolean,name: String?)
+    fun getOnlineState(): Boolean
+    fun setOnlineState(isOnline: Boolean)
 }

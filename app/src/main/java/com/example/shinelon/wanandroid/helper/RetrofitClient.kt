@@ -1,5 +1,6 @@
 package com.example.shinelon.wanandroid.helper
 
+import com.example.shinelon.wanandroid.utils.CustomInterceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -15,7 +16,8 @@ class RetrofitClient private constructor(){
         }
     }
 
-    val client = OkHttpClient.Builder()
+    private val client = OkHttpClient.Builder()
+            .addNetworkInterceptor(CustomInterceptor())
             .build()
 
     val retrofit = Retrofit.Builder()

@@ -33,6 +33,7 @@ class MainActivityImpl: AppCompatActivity(),IMainActivityView,NavigationView.OnN
 CommonDialogListener{
     val TAG = "MainActivityImpl"
     var presenter: MainActivityPresenter? = null
+    var isOnline = false
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.btn_home -> {
@@ -87,12 +88,23 @@ CommonDialogListener{
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         NavigationViewhelper.disableShiftMode(navigation_bottom)
 
+        setOnlineState(intent.getBooleanExtra("isOnline",false))
         val stateTv = navigation_view.getHeaderView(0).state_tv
         stateTv.setOnClickListener {
-            if(!presenter!!.userState) {
+            if(!getOnlineState()) {
                 presenter?.login()
+            }else {
+                presenter?.logout()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (drawer_layout.isDrawerOpen(Gravity.START)) {
+            drawer_layout.closeDrawer(Gravity.START)
+        }
+        presenter?.checkAutoLogin()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -105,16 +117,22 @@ CommonDialogListener{
         presenter?.addView(this)
     }
 
+    override fun getOnlineState() = isOnline
+
+    override fun setOnlineState(isOnline: Boolean){
+        this.isOnline = isOnline
+    }
+
     override fun getActivityContext() = this
 
     override fun updateHeaderView(isOnline: Boolean,name: String?) {
         val header = navigation_view.getHeaderView(0)
         if (isOnline) {
             header.name_tv.text = name
-            header.state_tv.text = resources.getString(R.string.user_login)
+            header.state_tv.text = resources.getString(R.string.user_logout)
         }else {
             header.name_tv.text = resources.getString(R.string.unknown_user)
-            header.state_tv.text = resources.getString(R.string.user_logout)
+            header.state_tv.text = resources.getString(R.string.user_login)
         }
     }
 

@@ -2,6 +2,8 @@ package com.example.shinelon.wanandroid.networkimp
 
 import com.example.shinelon.wanandroid.model.firstpage.LoginRsp
 import io.reactivex.Observable
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -20,8 +22,8 @@ interface LogInOutRetrofit {
     /**
      * 如果存在cookie,触发自动登录
      */
-    @GET("")
-    fun checkAutoLogin(@Header("cookie") cookie: String)
+    @GET("/")
+    fun checkAutoLogin(): Call<ResponseBody>
 
     /**
      * 注册新用户
