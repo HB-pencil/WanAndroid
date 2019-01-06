@@ -8,10 +8,12 @@ import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.shinelon.wanandroid.LoginActivityImpl
 import com.example.shinelon.wanandroid.UserInfo
+import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
 import com.example.shinelon.wanandroid.utils.PreferenceUtil
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
+import io.reactivex.annotations.Nullable
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -79,7 +81,8 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
         Log.w(TAG,"保存的cookie:$cookie\n保存的时间:$expireTime")
     }
 
-    override fun jumpToTarget() {
+    override fun jumpToTarget(flag: ActionFlag) {
+        if(flag != ActionFlag.LOGIN) return
         val context = view!!.getActivityContext()
         val intent = Intent(context, LoginActivityImpl::class.java)
         context.startActivity(intent)
@@ -87,7 +90,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
     }
 
     fun login() {
-        jumpToTarget()
+        jumpToTarget(ActionFlag.LOGIN)
     }
 
     fun logout(){

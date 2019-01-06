@@ -26,7 +26,6 @@ import com.example.shinelon.wanandroid.viewimp.IMainActivityView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
-import kotlinx.android.synthetic.main.header_layout_main.*
 import kotlinx.android.synthetic.main.header_layout_main.view.*
 
 class MainActivityImpl: AppCompatActivity(),IMainActivityView,NavigationView.OnNavigationItemSelectedListener,
@@ -143,7 +142,7 @@ CommonDialogListener{
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val name = intent?.getStringExtra("name")
-        val isOnline = intent?.getBooleanExtra("onLineState",false)
+        val isOnline = intent?.getBooleanExtra("isOnline",false)
         Log.d(TAG,"name:$name;isOnline:$isOnline")
         if (intent != null) updateHeaderView(isOnline!!,name)
     }

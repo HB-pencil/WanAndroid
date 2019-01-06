@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.CompoundButton
+import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.toast
 import com.example.shinelon.wanandroid.presenter.LoginActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.ILoginActivityView
@@ -26,7 +27,7 @@ class LoginActivityImpl:AppCompatActivity(),ILoginActivityView {
             _, isChecked -> presenter?.saveAutoLoginState(isChecked)
         }
         register_tv.setOnClickListener {
-            //TODO
+            presenter?.jumpToTarget(ActionFlag.REGISTER)
         }
     }
 

@@ -15,4 +15,9 @@
     <string name="register">注册</string>
     <string name="remember_password">自动登录</string>
     <string name="unknown_user">未登录用户</string>
+    
+    <string name="create_username">请输入用户名</string>
+    <string name="create_password">请输入密码</string>
+    <string name="confirm_password">请确认密码</string>
+    <string name="user_register">确认注册</string>
 </resources>

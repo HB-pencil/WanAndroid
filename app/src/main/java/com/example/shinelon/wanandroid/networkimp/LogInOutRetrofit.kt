@@ -1,6 +1,7 @@
 package com.example.shinelon.wanandroid.networkimp
 
-import com.example.shinelon.wanandroid.model.firstpage.LoginRsp
+import com.example.shinelon.wanandroid.modle.loginout.LoginRsp
+import com.example.shinelon.wanandroid.modle.loginout.RegisterRsp
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -31,7 +32,7 @@ interface LogInOutRetrofit {
     @POST("/user/register")
     @FormUrlEncoded
     fun register(@Field("username") username: String,@Field("password") password: String,
-                 @Field("repassword") repassword: String)
+                 @Field("repassword") repassword: String): Observable<RegisterRsp>
 
     /**
      * http://www.wanandroid.com/user/logout/json

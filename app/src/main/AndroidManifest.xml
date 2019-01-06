@@ -25,5 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivityImpl"/>
+        <activity android:name=".RegisterActivityImpl"
+            android:label="用户注册"/>
     </application>
 </manifest>
