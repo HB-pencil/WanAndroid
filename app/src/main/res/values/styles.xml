@@ -17,4 +17,9 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="HotSearchWindowsAnim">
+        <item name="android:windowEnterAnimation">@anim/anim_window_in</item>
+        <item name="android:windowExitAnimation">@anim/anim_window_out</item>
+    </style>
 </resources>

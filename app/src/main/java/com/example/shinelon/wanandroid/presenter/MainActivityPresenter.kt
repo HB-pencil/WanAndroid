@@ -10,10 +10,17 @@ import com.example.shinelon.wanandroid.LoginActivityImpl
 import com.example.shinelon.wanandroid.UserInfo
 import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
+import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.modle.HotWord
+import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
 import com.example.shinelon.wanandroid.utils.PreferenceUtil
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.Nullable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -101,5 +108,38 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
         spUtil.putBoolean("isAuto")
         spUtil.commit()
         view?.updateHeaderView(false,"")
+    }
+
+    fun getHotWords(){
+        val list = mutableListOf<String>()
+        RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
+                .getHotWord()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Observer<HotWord>{
+                    override fun onSubscribe(d: Disposable) {
+                        Log.d(TAG,"搜素热词 subscribe")
+                    }
+
+                    override fun onNext(t: HotWord) {
+                        Log.d(TAG,"搜索热词 onNext")
+                        if (t.errorCode >= 0){
+                            t.data.forEach {
+                                list.add(it.name)
+                            }
+                        } else {
+                            toast(view!!.getActivityContext(),t.errorMessage)
+                        }
+                        view?.showHotWords(list)
+                    }
+                    override fun onComplete() {
+                        Log.d(TAG,"搜索热词 onComplete")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.d(TAG,"搜索热词 onError")
+                        view?.showHotWords(list)
+                    }
+                })
     }
 }

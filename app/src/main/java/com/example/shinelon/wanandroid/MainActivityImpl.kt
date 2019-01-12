@@ -1,14 +1,17 @@
 package com.example.shinelon.wanandroid
 
 import android.app.Activity
+import android.app.Fragment
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
+import android.support.v4.view.MenuCompat
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
@@ -17,9 +20,12 @@ import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.TextView
 import com.example.shinelon.wanandroid.fragment.CommonDialogFragment
 import com.example.shinelon.wanandroid.fragment.CommonDialogListener
+import com.example.shinelon.wanandroid.fragment.HotSearchPopupWin
 import com.example.shinelon.wanandroid.helper.NavigationViewhelper
 import com.example.shinelon.wanandroid.presenter.MainActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
@@ -28,11 +34,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 import kotlinx.android.synthetic.main.header_layout_main.view.*
 
-class MainActivityImpl: AppCompatActivity(),IMainActivityView,NavigationView.OnNavigationItemSelectedListener,
-CommonDialogListener{
+class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener,
+        CommonDialogListener {
     val TAG = "MainActivityImpl"
     var presenter: MainActivityPresenter? = null
     var isOnline = false
+    var mWindow: HotSearchPopupWin? = null
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.btn_home -> {
@@ -74,12 +81,12 @@ CommonDialogListener{
         setContentView(R.layout.activity_base)
         setSupportActionBar(toolbar_base)
 
-        val toggle =ActionBarDrawerToggle(this,drawer_layout,toolbar_base,R.string.open_navigation,R.string.close_navigation)
+        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar_base, R.string.open_navigation, R.string.close_navigation)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        if (presenter == null ) setPresenter()
-        val permissions = arrayOf("android.permission.READ_EXTERNAL_STORAGE","android.permission.WRITE_EXTERNAL_STORAGE")
+        if (presenter == null) setPresenter()
+        val permissions = arrayOf("android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE")
         presenter?.checkPermissions(permissions)
 
         navigation_view.setNavigationItemSelectedListener(this)
@@ -87,12 +94,12 @@ CommonDialogListener{
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         NavigationViewhelper.disableShiftMode(navigation_bottom)
 
-        setOnlineState(intent.getBooleanExtra("isOnline",false))
+        setOnlineState(intent.getBooleanExtra("isOnline", false))
         val stateTv = navigation_view.getHeaderView(0).state_tv
         stateTv.setOnClickListener {
-            if(!getOnlineState()) {
+            if (!getOnlineState()) {
                 presenter?.login()
-            }else {
+            } else {
                 presenter?.logout()
             }
         }
@@ -107,7 +114,28 @@ CommonDialogListener{
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.activity_main_menu,menu)
+        menuInflater.inflate(R.menu.activity_main_menu, menu)
+        val menuItem = menu?.findItem(R.id.search)
+        val searchView = menuItem?.actionView as SearchView
+        searchView.isSubmitButtonEnabled = true
+        searchView.queryHint = "搜索"
+        searchView.setOnSearchClickListener {
+
+            presenter?.getHotWords()
+        }
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return true
+            }
+        })
+        searchView.setOnCloseListener {
+            hideHotWords()
+            false
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -118,18 +146,18 @@ CommonDialogListener{
 
     override fun getOnlineState() = isOnline
 
-    override fun setOnlineState(isOnline: Boolean){
+    override fun setOnlineState(isOnline: Boolean) {
         this.isOnline = isOnline
     }
 
     override fun getActivityContext() = this
 
-    override fun updateHeaderView(isOnline: Boolean,name: String?) {
+    override fun updateHeaderView(isOnline: Boolean, name: String?) {
         val header = navigation_view.getHeaderView(0)
         if (isOnline) {
             header.name_tv.text = name
             header.state_tv.text = resources.getString(R.string.user_logout)
-        }else {
+        } else {
             header.name_tv.text = resources.getString(R.string.unknown_user)
             header.state_tv.text = resources.getString(R.string.user_login)
         }
@@ -142,9 +170,9 @@ CommonDialogListener{
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val name = intent?.getStringExtra("name")
-        val isOnline = intent?.getBooleanExtra("isOnline",false)
-        Log.d(TAG,"name:$name;isOnline:$isOnline")
-        if (intent != null) updateHeaderView(isOnline!!,name)
+        val isOnline = intent?.getBooleanExtra("isOnline", false)
+        Log.d(TAG, "name:$name;isOnline:$isOnline")
+        if (intent != null) updateHeaderView(isOnline!!, name)
     }
 
     override fun onBackPressed() {
@@ -157,8 +185,8 @@ CommonDialogListener{
 
     override fun onPositiveClick() {
         val i = Intent()
-        i.action= Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.fromParts("package",this.packageName,null)
+        i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        val uri = Uri.fromParts("package", this.packageName, null)
         i.data = uri
         startActivity(i)
     }
@@ -169,12 +197,12 @@ CommonDialogListener{
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode==0&& Build.VERSION.SDK_INT>=23){
+        if (requestCode == 0 && Build.VERSION.SDK_INT >= 23) {
             grantResults.forEach {
-                if(it== PackageManager.PERMISSION_DENIED){
-                    if(!shouldShowRequestPermissionRationale(permissions[grantResults.indexOf(it)])){
+                if (it == PackageManager.PERMISSION_DENIED) {
+                    if (!shouldShowRequestPermissionRationale(permissions[grantResults.indexOf(it)])) {
                         showWarnDialog()
-                    }else{
+                    } else {
                         finish()
                     }
                 }
@@ -182,10 +210,33 @@ CommonDialogListener{
         }
     }
 
-    fun showWarnDialog(){
-        val dialog = CommonDialogFragment.newInstance("警告","为了让软件正常工作，请您允许通过申请的权限，否则将无法提供服务！",
+    fun showWarnDialog() {
+        val dialog = CommonDialogFragment.newInstance("警告", "为了让软件正常工作，请您允许通过申请的权限，否则将无法提供服务！",
                 this)
-        dialog.show(fragmentManager,"tag")
+        dialog.show(fragmentManager, "tag")
+    }
+
+    override fun showHotWords(list: MutableList<String>) {
+        val hotWindow = HotSearchPopupWin(this)
+        if (mWindow == null) mWindow = hotWindow
+        hotWindow.width = WindowManager.LayoutParams.MATCH_PARENT
+        hotWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
+        hotWindow.isErrorViewShow(list.isEmpty())
+        for (i in 0..(list.size - 1) step 2) {
+            hotWindow.addHotWord(list[i], if (i + 1 == list.size) "" else list[i + 1])
+        }
+        hotWindow.showWindow(toolbar_base)
+        val contentView = window.decorView.findViewById<FrameLayout>(android.R.id.content)
+        contentView.setBackgroundColor(resources.getColor(R.color.mask))
+        hotWindow.setOnDismissListener {
+            contentView.setBackgroundColor(Color.WHITE)
+        }
+    }
+
+    override fun hideHotWords() {
+        mWindow?.dismiss()
+        mWindow = null
     }
 }
+
 

@@ -20,4 +20,7 @@
     <string name="create_password">请输入密码</string>
     <string name="confirm_password">请确认密码</string>
     <string name="user_register">确认注册</string>
+
+    <string name="hot_words">搜索热词</string>
+    <string name="error_msg">没有找到搜索热词呢( ╯□╰ )！</string>
 </resources>

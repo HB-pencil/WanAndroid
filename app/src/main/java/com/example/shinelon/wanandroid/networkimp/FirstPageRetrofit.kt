@@ -1,5 +1,8 @@
 package com.example.shinelon.wanandroid.networkimp
 
+import com.example.shinelon.wanandroid.modle.HotWord
+import io.reactivex.Observable
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -42,8 +45,8 @@ interface FirstPageRetrofit {
      *方法：GET
      *参数：无
      */
-    @GET()
-    fun getHotWord()
+    @GET("/hotkey/json")
+    fun getHotWord(): Observable<HotWord>
 
     /**
      *

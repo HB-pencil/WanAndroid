@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/user_register"
-            android:background="@drawable/ripple"
+            android:background="@drawable/ripple_general"
             android:layout_marginTop="5dp"/>
     </LinearLayout>
 </RelativeLayout>
