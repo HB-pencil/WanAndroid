@@ -1,7 +1,9 @@
 package com.example.shinelon.wanandroid.networkimp
 
+import com.example.shinelon.wanandroid.modle.Banner
 import com.example.shinelon.wanandroid.modle.HotWord
 import io.reactivex.Observable
+import io.reactivex.Observer
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -28,7 +30,7 @@ interface FirstPageRetrofit {
      *参数：无
      */
     @GET("/banner/json")
-    fun getBanner()
+    fun getBanner(): Observable<Banner>
 
     /**
      * 常用网站

@@ -22,9 +22,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
 }
 
 def siteUrl = 'https://github.com/HpWens/BaseRecyclerAdapter' // 项目的主页

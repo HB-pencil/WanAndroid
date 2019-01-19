@@ -29,9 +29,9 @@ class CommonBottomSheetDialog: BottomSheetDialogFragment(){
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
 
-        val title = arguments.getString("title")
-        val message = arguments.getString("message")
-        val dialog = BottomSheetDialog(context)
+        val title = arguments?.getString("title")
+        val message = arguments?.getString("message")
+        val dialog = BottomSheetDialog(context!!)
         val frameLayout = FrameLayout(context)
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_bottom,frameLayout,true)
         dialog.setContentView(frameLayout)

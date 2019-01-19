@@ -6,11 +6,13 @@ import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.View
 import com.example.shinelon.wanandroid.LoginActivityImpl
 import com.example.shinelon.wanandroid.UserInfo
 import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.modle.Banner
 import com.example.shinelon.wanandroid.modle.HotWord
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
@@ -84,6 +86,13 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                             view?.setOnlineState(false)
                         }
                     })
+        }else if (isAuto) {
+            val spUtil = PreferenceUtil()
+            spUtil.putString("cookie")
+            spUtil.putLong("expireTime",Long.MIN_VALUE)
+            spUtil.putBoolean("isAuto",false)
+            view?.updateHeaderView(false,"")
+            view?.setOnlineState(false)
         }
         Log.w(TAG,"保存的cookie:$cookie\n保存的时间:$expireTime")
     }
@@ -118,7 +127,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Observer<HotWord>{
                     override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG,"搜素热词 subscribe")
+                        Log.d(TAG,"搜素热词 onSubscribe")
                     }
 
                     override fun onNext(t: HotWord) {
@@ -141,5 +150,39 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                         view?.showHotWords(list)
                     }
                 })
+    }
+
+    fun getBanner(){
+        RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
+                .getBanner()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Observer<Banner>{
+                    override fun onSubscribe(d: Disposable) {
+                        Log.d(TAG,"获取banner onSubscribe()")
+                    }
+
+                    override fun onNext(t: Banner) {
+                        Log.d(TAG,"获取Banner onNext")
+                        if(t.errorCode >= 0){
+                            view?.createBannerView(t.data)
+                        }else{
+                            view?.createBannerView(mutableListOf())
+                        }
+                    }
+
+                    override fun onComplete() {
+                        Log.d(TAG,"获取Banner onComplete")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.e(TAG,"获取Banner onError $e")
+                        view?.createBannerView(mutableListOf())
+                    }
+                })
+    }
+
+    fun onPageItemClick(url: String){
+
     }
 }
