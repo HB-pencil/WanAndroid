@@ -370,7 +370,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         vpAdapter = ViewPagerAdapter(viewList)
         itemBannerV?.viewpager_main?.adapter = vpAdapter
         //此处取值过大的话会导致ANR
-        itemBannerV?.viewpager_main?.currentItem = 2100
+        itemBannerV?.viewpager_main?.currentItem = 105
         //这里不能用lambdas，我佛了
         vpAdapter?.addItemClickListener(object : ViewPagerAdapter.OnItemClickListener {
             override fun onItemClick(realPosition: Int) {
@@ -380,11 +380,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         Timer().schedule(object : TimerTask() {
             override fun run() {
                 runOnUiThread {
-                    //TODO 此处不知为什么失效了
-                    itemBannerV!!.viewpager_main!!.currentItem = itemBannerV!!.viewpager_main!!.currentItem++
+                    itemBannerV!!.viewpager_main!!.currentItem = ++itemBannerV!!.viewpager_main!!.currentItem
                 }
             }
-        }, 3000)
+        }, 3000,3000)
         itemBannerV!!.main_occupy.visibility = View.GONE
     }
 
