@@ -23,4 +23,10 @@
 
     <string name="hot_words">搜索热词</string>
     <string name="error_msg">没有找到搜索热词呢( ╯□╰ )！</string>
+
+    <string name="author">作者：</string>
+    <string name="category">分类：</string>
+    <string name="time">时间：</string>
+
+    <string name="load_error">加载错误，请稍后再试( ╯□╰ )！</string>
 </resources>

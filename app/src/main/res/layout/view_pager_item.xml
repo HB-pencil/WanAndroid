@@ -16,7 +16,7 @@
         android:padding="2dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:textColor="@color/black"
+        android:textColor="@color/red"
         android:maxLines="2"
         tools:text="测试标题"/>
 </LinearLayout>

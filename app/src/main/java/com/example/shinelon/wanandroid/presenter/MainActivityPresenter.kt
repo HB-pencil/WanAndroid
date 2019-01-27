@@ -12,7 +12,9 @@ import com.example.shinelon.wanandroid.UserInfo
 import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.modle.Articles
 import com.example.shinelon.wanandroid.modle.Banner
+import com.example.shinelon.wanandroid.modle.DatasBean
 import com.example.shinelon.wanandroid.modle.HotWord
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
@@ -73,32 +75,32 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                         override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                             //FIXME 自动登录成功验证，不知道具体什么是登录成功？
                             if (response.isSuccessful) {
-                                view?.updateHeaderView(true,userName)
+                                view?.updateHeaderView(true, userName)
                                 view?.setOnlineState(true)
-                            }else{
-                                view?.updateHeaderView(false,"")
+                            } else {
+                                view?.updateHeaderView(false, "")
                                 view?.setOnlineState(false)
                             }
                         }
 
                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                            view?.updateHeaderView(false,"")
+                            view?.updateHeaderView(false, "")
                             view?.setOnlineState(false)
                         }
                     })
-        }else if (isAuto) {
+        } else if (isAuto) {
             val spUtil = PreferenceUtil()
             spUtil.putString("cookie")
-            spUtil.putLong("expireTime",Long.MIN_VALUE)
-            spUtil.putBoolean("isAuto",false)
-            view?.updateHeaderView(false,"")
+            spUtil.putLong("expireTime", Long.MIN_VALUE)
+            spUtil.putBoolean("isAuto", false)
+            view?.updateHeaderView(false, "")
             view?.setOnlineState(false)
         }
-        Log.w(TAG,"保存的cookie:$cookie\n保存的时间:$expireTime")
+        Log.w(TAG, "保存的cookie:$cookie\n保存的时间:$expireTime")
     }
 
     override fun jumpToTarget(flag: ActionFlag) {
-        if(flag != ActionFlag.LOGIN) return
+        if (flag != ActionFlag.LOGIN) return
         val context = view!!.getActivityContext()
         val intent = Intent(context, LoginActivityImpl::class.java)
         context.startActivity(intent)
@@ -109,80 +111,114 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
         jumpToTarget(ActionFlag.LOGIN)
     }
 
-    fun logout(){
+    fun logout() {
         val spUtil = PreferenceUtil.getInstance()
         spUtil.putString("username")
         spUtil.putString("cookie")
         spUtil.putLong("expireTime")
         spUtil.putBoolean("isAuto")
         spUtil.commit()
-        view?.updateHeaderView(false,"")
+        view?.updateHeaderView(false, "")
     }
 
-    fun getHotWords(){
+    fun getHotWords() {
         val list = mutableListOf<String>()
         RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
                 .getHotWord()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object: Observer<HotWord>{
+                .subscribe(object : Observer<HotWord> {
                     override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG,"搜素热词 onSubscribe")
+                        Log.d(TAG, "搜素热词 onSubscribe")
                     }
 
                     override fun onNext(t: HotWord) {
-                        Log.d(TAG,"搜索热词 onNext")
-                        if (t.errorCode >= 0){
+                        Log.d(TAG, "搜索热词 onNext")
+                        if (t.errorCode >= 0) {
                             t.data.forEach {
                                 list.add(it.name)
                             }
                         } else {
-                            toast(view!!.getActivityContext(),t.errorMessage)
+                            toast(view!!.getActivityContext(), t.errorMessage)
                         }
                         view?.showHotWords(list)
                     }
+
                     override fun onComplete() {
-                        Log.d(TAG,"搜索热词 onComplete")
+                        Log.d(TAG, "搜索热词 onComplete")
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.d(TAG,"搜索热词 onError")
+                        Log.d(TAG, "搜索热词 onError")
                         view?.showHotWords(list)
                     }
                 })
     }
 
-    fun getBanner(){
+    fun getBanner() {
         RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
                 .getBanner()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object: Observer<Banner>{
+                .subscribe(object : Observer<Banner> {
                     override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG,"获取banner onSubscribe()")
+                        Log.d(TAG, "获取banner onSubscribe()")
                     }
 
                     override fun onNext(t: Banner) {
-                        Log.d(TAG,"获取Banner onNext")
-                        if(t.errorCode >= 0){
+                        Log.d(TAG, "获取Banner onNext")
+                        if (t.errorCode >= 0) {
                             view?.createBannerView(t.data)
-                        }else{
+                        } else {
                             view?.createBannerView(mutableListOf())
                         }
                     }
 
                     override fun onComplete() {
-                        Log.d(TAG,"获取Banner onComplete")
+                        Log.d(TAG, "获取Banner onComplete")
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.e(TAG,"获取Banner onError $e")
+                        Log.e(TAG, "获取Banner onError $e")
                         view?.createBannerView(mutableListOf())
                     }
                 })
     }
 
-    fun onPageItemClick(url: String){
+    fun onPageItemClick(url: String) {
 
+    }
+
+    /**
+     * 负责拿到网络请求结果给View，不用关心view怎么刷新UI
+     */
+    fun getArticleList(num: Int = 0) {
+        RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
+                .getArticle(num)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<Articles> {
+                    override fun onSubscribe(d: Disposable) {
+                        Log.d(TAG, "获取文章 onSubscribe")
+                    }
+
+                    override fun onNext(t: Articles) {
+                        Log.d(TAG, "获取文章 onNext")
+                        if (t.errorCode >= 0) {
+                            view?.createContentView(t.data)
+                        } else {
+                            view?.createContentView(null)
+                        }
+                    }
+
+                    override fun onComplete() {
+                        Log.d(TAG, "获取文章 onComplete")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.e(TAG, "获取文章 $e")
+                        view?.createContentView(null)
+                    }
+                })
     }
 }

@@ -1,5 +1,6 @@
 package com.example.shinelon.wanandroid.networkimp
 
+import com.example.shinelon.wanandroid.modle.Articles
 import com.example.shinelon.wanandroid.modle.Banner
 import com.example.shinelon.wanandroid.modle.HotWord
 import io.reactivex.Observable
@@ -21,7 +22,7 @@ interface FirstPageRetrofit {
      *"superChapterName": "framework", // 一级分类的名称
      */
     @GET("/article/list/{pageNum}/json")
-    fun getArticle(@Path("pageNum") pageNum: Int)
+    fun getArticle(@Path("pageNum") pageNum: Int): Observable<Articles>
 
     /**
      * 首页banner

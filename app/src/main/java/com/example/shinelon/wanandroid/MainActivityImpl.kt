@@ -1,5 +1,8 @@
 package com.example.shinelon.wanandroid
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator.INFINITE
+import android.animation.ValueAnimator.RESTART
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -12,38 +15,56 @@ import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.FitCenter
+
 import com.bumptech.glide.request.RequestOptions
 import com.example.shinelon.wanandroid.fragment.CommonDialogFragment
 import com.example.shinelon.wanandroid.fragment.CommonDialogListener
 import com.example.shinelon.wanandroid.fragment.HotSearchPopupWin
+import com.example.shinelon.wanandroid.helper.BaseAdapter
+import com.example.shinelon.wanandroid.helper.BaseViewHolder
 import com.example.shinelon.wanandroid.helper.NavigationViewhelper
 import com.example.shinelon.wanandroid.helper.ViewPagerAdapter
+import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DataBeanBanner
+import com.example.shinelon.wanandroid.modle.DatasBean
 import com.example.shinelon.wanandroid.presenter.MainActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
+import kotlinx.android.synthetic.main.article_item_banner.view.*
 import kotlinx.android.synthetic.main.header_layout_main.view.*
 import kotlinx.android.synthetic.main.view_pager_item.view.*
-
+import java.util.*
 
 class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener,
         CommonDialogListener {
-    val TAG = "MainActivityImpl"
-    var presenter: MainActivityPresenter? = null
-    var isOnline = false
-    var mWindow: HotSearchPopupWin? = null
-    val list = mutableListOf<View>()
-    val listBannerUrl = mutableListOf<String>()
-    var adapter: ViewPagerAdapter? = null
+    private val TAG = "MainActivityImpl"
+
+    private var presenter: MainActivityPresenter? = null
+    private var isOnline = false
+    private var mWindow: HotSearchPopupWin? = null
+    private val viewList = mutableListOf<View>()
+    private val itemList = mutableListOf<Any>()
+    private val listBannerUrl = mutableListOf<String>()
+    private var vpAdapter: ViewPagerAdapter? = null
+    private var itemBannerV: View? = null
+    private var currentPage = 0
+    private var rcyvAdapter: BaseAdapter? = null
+    private var isLoading = false
+    private var currentIndex = 1
+
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.btn_home -> {
@@ -68,7 +89,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
             }
             R.id.panel_love_web -> {
-
+                Color.GREEN
             }
             R.id.panel_night_mode -> {
 
@@ -107,34 +128,89 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                 presenter?.logout()
             }
         }
+        //此处两个为占位，分别是banner和load,load默认不可见
+        itemList.add(Any())
+        itemList.add(Any())
 
-        //占位
-        val view = LayoutInflater.from(this).inflate(R.layout.view_pager_item,null,false)
-        view.banner_image_item.setImageDrawable(resources.getDrawable(R.drawable.loading))
-        view.banner_image_title.text = ""
-        list.add(view)
-        listBannerUrl.add("")
-        adapter = ViewPagerAdapter(list)
-        viewpager_main.adapter = adapter
-        viewpager_main.currentItem = Integer.MAX_VALUE/2
-        //这里不能用lambdas，我佛了
-        adapter?.addItemClickListener(object: ViewPagerAdapter.OnItemClickListener{
-            override fun onItemClick(realPosition: Int) {
-                presenter?.onPageItemClick(listBannerUrl[realPosition])
+        rcyvAdapter = object : BaseAdapter(itemList) {
+            override fun bindData(holder: BaseViewHolder, position: Int) {
+                when (position) {
+                    0 -> itemBannerV = holder.itemView //这里获得Banner这个item的View方便添加
+                    itemList.size - 1 -> Unit
+                    else -> {
+                        val article = itemList[position] as DatasBean
+                        holder.getChildView<TextView>(R.id.article_title_item).text = article.title
+                        if (article.tags.size > 0) {
+                            val sbf = StringBuffer()
+                            article.tags.forEach {
+                                sbf.append("${it.name} ")
+                            }
+                            holder.getChildView<Button>(R.id.article_tags_item).text = sbf.toString()
+                            holder.getChildView<Button>(R.id.article_tags_item).visibility = View.VISIBLE
+                        } else {
+                            holder.getChildView<Button>(R.id.article_tags_item).visibility = View.INVISIBLE
+                        }
+                        holder.getChildView<TextView>(R.id.author_item).text = article.author
+                        holder.getChildView<TextView>(R.id.article_category).text = "${article.superChapterName} ${article.chapterName}"
+                        holder.getChildView<TextView>(R.id.article_time).text = article.niceDate
+                    }
+                }
+            }
+
+            override fun getItemLayoutId(position: Int): Int {
+                when (position) {
+                    0 -> return R.layout.article_item_banner
+                    itemList.size - 1 -> return R.layout.article_item_load_more
+                    else -> return R.layout.article_item_layout
+                }
+            }
+
+            override fun onItemClick(position: Int) {
+                super.onItemClick(position)
+            }
+        }
+        recycler_view_main.layoutManager = LinearLayoutManager(this)
+        recycler_view_main.adapter = rcyvAdapter
+
+        Handler().postDelayed({
+            presenter?.getBanner()
+            presenter?.getArticleList(currentPage)
+        }, 500)
+
+        val layoutManager = recycler_view_main.layoutManager as LinearLayoutManager
+
+
+        recycler_view_main.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                //滑到底部加载更多
+                var animator: ObjectAnimator? = null
+                var loadView: ImageView? = null
+                var loadErrView: TextView? = null
+                if (dy > 0 && layoutManager.findFirstVisibleItemPosition() > 0 &&
+                        layoutManager.findLastVisibleItemPosition() == itemList.size - 1) {
+                    loadView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more)
+                    loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)
+                    loadErrView?.visibility = View.INVISIBLE
+
+                    animator = ObjectAnimator.ofFloat(loadView!!, "rotation", 0F, 360F)
+                    animator.duration = 1000
+                    animator.repeatMode = RESTART
+                    animator.repeatCount = INFINITE
+                    animator.start()
+                    loadView.visibility = View.VISIBLE
+                    if (!isLoading) {
+                        Handler().postDelayed({
+                            presenter?.getArticleList(currentPage++)
+                        }, 500)
+                    }
+                } else {
+                    animator?.end()
+                    loadView?.visibility = View.INVISIBLE
+                }
             }
         })
 
-        //真正初始化list
-        presenter?.getBanner()
-
-        val handler = Handler()
-        val runnable = object: Runnable{
-            override fun run() {
-                viewpager_main.currentItem = ++viewpager_main.currentItem % Integer.MAX_VALUE
-                handler.postDelayed(this,4000)
-            }
-        }
-        handler.postDelayed(runnable,4000)
     }
 
     override fun onResume() {
@@ -269,27 +345,67 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         mWindow = null
     }
 
-    //TODO 目前加载时间过长，后续优化
-    override fun createBannerView(mutableList: MutableList<DataBeanBanner>): MutableList<View> {
+    override fun createBannerView(mutableList: MutableList<DataBeanBanner>) {
+        if (mutableList.isEmpty()) return
         val options = RequestOptions()
                 .error(R.drawable.error_image)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.loading)
+                //.placeholder(R.drawable.loading)
                 .fitCenter()
-        if(!list.isEmpty() && !mutableList.isEmpty()) list.clear()
         mutableList.forEach {
-            val view = LayoutInflater.from(this).inflate(R.layout.view_pager_item,null,false)
+            val view = LayoutInflater.from(this).inflate(R.layout.view_pager_item, null, false)
             view.banner_image_title.text = it.title
             Glide.with(this)
                     .load(it.imagePath)
                     .apply(options)
                     .into(view.banner_image_item)
-            list.add(view)
+            viewList.add(view)
             listBannerUrl.add(it.url)
-            Log.w(TAG,"${it.imagePath}")
         }
-        adapter?.notifyDataSetChanged()
-        return list
+        startBanner()
+    }
+
+    fun startBanner() {
+        if (viewList.isEmpty() || itemBannerV == null) return
+        vpAdapter = ViewPagerAdapter(viewList)
+        itemBannerV?.viewpager_main?.adapter = vpAdapter
+        //此处取值过大的话会导致ANR
+        itemBannerV?.viewpager_main?.currentItem = 2100
+        //这里不能用lambdas，我佛了
+        vpAdapter?.addItemClickListener(object : ViewPagerAdapter.OnItemClickListener {
+            override fun onItemClick(realPosition: Int) {
+                presenter?.onPageItemClick(listBannerUrl[realPosition])
+            }
+        })
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    //TODO 此处不知为什么失效了
+                    itemBannerV!!.viewpager_main!!.currentItem = itemBannerV!!.viewpager_main!!.currentItem++
+                }
+            }
+        }, 3000)
+        itemBannerV!!.main_occupy.visibility = View.GONE
+    }
+
+    override fun createContentView(data: DataBean?) {
+        if (data == null) {
+            val loadView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<ImageView>(R.id.article_item_load_more)
+            loadView.visibility = View.INVISIBLE
+            val loadErrView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<TextView>(R.id.article_item_load_more_error)
+            loadErrView.visibility = View.VISIBLE
+            return
+        }
+        currentPage = data.curPage
+        val articles = mutableListOf<DatasBean>()
+        data.datas.forEach {
+            articles.add(it)
+        }
+        //插入数据源
+        itemList.addAll(currentIndex, articles)
+        rcyvAdapter!!.notifyItemInserted(currentIndex)
+        currentIndex += data.datas.size
+        Log.i(TAG, "itemList size: ${itemList.size}")
     }
 }
 

@@ -1,7 +1,6 @@
 package com.example.shinelon.wanandroid.viewimp
 
-import android.view.View
-import com.example.shinelon.wanandroid.modle.Banner
+import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DataBeanBanner
 
 /**
@@ -13,5 +12,6 @@ interface IMainActivityView: IView {
     fun setOnlineState(isOnline: Boolean)
     fun showHotWords(list: MutableList<String>)
     fun hideHotWords()
-    fun createBannerView(mutableList: MutableList<DataBeanBanner>): MutableList<View>
+    fun createBannerView(mutableList: MutableList<DataBeanBanner>)
+    fun createContentView(data: DataBean?)
 }

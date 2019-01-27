@@ -12,15 +12,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager_main"
-            android:layout_width="match_parent"
-            android:layout_height="210dp"
-            android:layout_margin="20dp"/>
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView_main"
+            android:id="@+id/recycler_view_main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"/>
     </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
