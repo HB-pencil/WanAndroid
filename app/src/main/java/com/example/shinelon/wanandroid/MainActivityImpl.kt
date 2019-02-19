@@ -167,6 +167,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
             override fun onItemClick(position: Int) {
                 super.onItemClick(position)
+                if (position > 0 && position < itemList.size-1) {
+                    val item = itemList[position] as DatasBean
+                    presenter?.loadWeb(item.link)
+                }
             }
         }
         recycler_view_main.layoutManager = LinearLayoutManager(this)
@@ -193,16 +197,17 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                     loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)
                     loadErrView?.visibility = View.INVISIBLE
 
-                    animator = ObjectAnimator.ofFloat(loadView!!, "rotation", 0F, 360F)
-                    animator.duration = 1000
-                    animator.repeatMode = RESTART
-                    animator.repeatCount = INFINITE
-                    animator.start()
-                    loadView.visibility = View.VISIBLE
                     if (!isLoading) {
+                        animator = ObjectAnimator.ofFloat(loadView!!, "rotation", 0F, 360F)
+                        animator.duration = 1000
+                        animator.repeatMode = RESTART
+                        animator.repeatCount = INFINITE
+                        loadView.visibility = View.VISIBLE
+                        animator.start()
                         Handler().postDelayed({
                             presenter?.getArticleList(currentPage++)
                         }, 500)
+                        isLoading = true
                     }
                 } else {
                     animator?.end()

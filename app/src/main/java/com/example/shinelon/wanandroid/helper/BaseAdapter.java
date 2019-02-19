@@ -22,12 +22,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     @Override
     public void onBindViewHolder(BaseViewHolder holder, final int position) {
-        holder.getItemView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onItemClick(position);
-            }
-        });
+        holder.getItemView().setOnClickListener((v)-> onItemClick(position));
         bindData(holder,position);
     }
 

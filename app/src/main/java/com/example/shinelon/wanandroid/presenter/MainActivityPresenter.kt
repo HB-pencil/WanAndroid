@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.View
+import com.example.shinelon.wanandroid.CommonWebViewActivity
 import com.example.shinelon.wanandroid.LoginActivityImpl
 import com.example.shinelon.wanandroid.UserInfo
 import com.example.shinelon.wanandroid.helper.ActionFlag
@@ -186,7 +187,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
     }
 
     fun onPageItemClick(url: String) {
-
+        loadWeb(url)
     }
 
     /**
@@ -220,5 +221,13 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                         view?.createContentView(null)
                     }
                 })
+    }
+
+    fun loadWeb(url: String){
+        val context = view!!.getActivityContext()
+        val intent = Intent(context,CommonWebViewActivity::class.java)
+        intent.putExtra("web_url",url)
+        context.startActivity(intent)
+        context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }
