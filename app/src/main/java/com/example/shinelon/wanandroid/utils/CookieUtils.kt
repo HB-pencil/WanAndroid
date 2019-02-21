@@ -8,7 +8,7 @@ import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.*
 
-class CookieUtil{
+class CookieUtils{
     companion object {
         val TAG = "CookieUtil"
         fun initCookie(response: Response<LoginRsp>){
@@ -34,7 +34,7 @@ class CookieUtil{
         fun isSaveCookies(isSave: Boolean) {
             var cookieString = ""
             var expireTime = Long.MIN_VALUE
-            val spUtil = PreferenceUtil.getInstance()
+            val spUtil = PreferenceUtils.getInstance()
             if(isSave) {
                 cookieString = UserInfo.INSTANCE.cookie
                 expireTime = UserInfo.INSTANCE.expire
@@ -61,7 +61,7 @@ class CookieUtil{
         }
 
         fun isAutoLogin(): Boolean{
-            val spUtil = PreferenceUtil.getInstance()
+            val spUtil = PreferenceUtils.getInstance()
             return spUtil.getBoolean("isAuto")
         }
     }

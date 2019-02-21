@@ -11,7 +11,7 @@ import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.modle.loginout.LoginRsp
 import com.example.shinelon.wanandroid.modle.loginout.RegisterRsp
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
-import com.example.shinelon.wanandroid.utils.CookieUtil
+import com.example.shinelon.wanandroid.utils.CookieUtils
 import com.example.shinelon.wanandroid.viewimp.IRegisterAvtivityView
 import io.reactivex.ObservableSource
 import io.reactivex.Observer
@@ -34,12 +34,11 @@ class RegisterActivityPresenter: AbsPresenter<IRegisterAvtivityView>(){
         }
     }
 
-    override fun jumpToTarget(flag: ActionFlag) {
+    override fun jumpToTarget(flag: ActionFlag,intent: Intent) {
         if (flag != ActionFlag.HOME) return
-        val context = view!!.getActivityContext()
-        val intent = Intent(context, MainActivityImpl::class.java)
         intent.putExtra("name",view?.getAccount())
         intent.putExtra("isOnline",true)
+        val context = view!!.getActivityContext()
         context.startActivity(intent)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
@@ -78,10 +77,12 @@ class RegisterActivityPresenter: AbsPresenter<IRegisterAvtivityView>(){
                         Log.d(TAG,"onNext")
                         if (response.body()!!.errorCode >= 0) {
                             view?.showSuccess("登录成功！")
-                            jumpToTarget(ActionFlag.HOME)
+                            val context = view!!.getActivityContext()
+                            val intent = Intent(context, MainActivityImpl::class.java)
+                            jumpToTarget(ActionFlag.HOME,intent)
                             UserInfo.INSTANCE.userName = view?.getAccount()?:""
-                            CookieUtil.initCookie(response)
-                            CookieUtil.isSaveCookies(CookieUtil.isAutoLogin())
+                            CookieUtils.initCookie(response)
+                            CookieUtils.isSaveCookies(CookieUtils.isAutoLogin())
                         } else {
                             view?.showError(response.body()?.errorMsg?:"登录失败！")
                         }

@@ -6,6 +6,7 @@ import android.animation.ValueAnimator.RESTART
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Network
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -31,10 +32,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.shinelon.wanandroid.fragment.CommonDialogFragment
 import com.example.shinelon.wanandroid.fragment.CommonDialogListener
 import com.example.shinelon.wanandroid.fragment.HotSearchPopupWin
-import com.example.shinelon.wanandroid.helper.BaseAdapter
-import com.example.shinelon.wanandroid.helper.BaseViewHolder
-import com.example.shinelon.wanandroid.helper.NavigationViewhelper
-import com.example.shinelon.wanandroid.helper.ViewPagerAdapter
+import com.example.shinelon.wanandroid.helper.*
 import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DataBeanBanner
 import com.example.shinelon.wanandroid.modle.DatasBean
@@ -53,7 +51,6 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     private val TAG = "MainActivityImpl"
 
     private var presenter: MainActivityPresenter? = null
-    private var isOnline = false
     private var mWindow: HotSearchPopupWin? = null
     private val viewList = mutableListOf<View>()
     private val itemList = mutableListOf<Any>()
@@ -111,8 +108,11 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         toggle.syncState()
 
         if (presenter == null) setPresenter()
-        val permissions = arrayOf("android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE")
+        val permissions = arrayOf("android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE",
+                "android.permission.ACCESS_NETWORK_STATE")
+
         presenter?.checkPermissions(permissions)
+        presenter?.checkNetworkState()
 
         navigation_view.setNavigationItemSelectedListener(this)
 
@@ -127,6 +127,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             } else {
                 presenter?.logout()
             }
+            Log.d(TAG,"操作${stateTv.text}")
         }
         //此处两个为占位，分别是banner和load,load默认不可见
         itemList.add(Any())
@@ -167,7 +168,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
             override fun onItemClick(position: Int) {
                 super.onItemClick(position)
-                if (position > 0 && position < itemList.size-1) {
+                if (position > 0 && position < itemList.size - 1) {
                     val item = itemList[position] as DatasBean
                     presenter?.loadWeb(item.link)
                 }
@@ -237,6 +238,9 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                val intent = Intent(this@MainActivityImpl, ISearchArticleActivityImpl::class.java)
+                intent.putExtra("search_key", query)
+                presenter?.jumpToTarget(ActionFlag.SEARCH, intent)
                 return true
             }
 
@@ -256,10 +260,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         presenter?.addView(this)
     }
 
-    override fun getOnlineState() = isOnline
+    override fun getOnlineState() = UserInfo.INSTANCE.isOnline
 
     override fun setOnlineState(isOnline: Boolean) {
-        this.isOnline = isOnline
+        UserInfo.INSTANCE.isOnline = isOnline
     }
 
     override fun getActivityContext() = this
@@ -313,7 +317,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             grantResults.forEach {
                 if (it == PackageManager.PERMISSION_DENIED) {
                     if (!shouldShowRequestPermissionRationale(permissions[grantResults.indexOf(it)])) {
-                        showWarnDialog()
+                        showWarnDialog(this@MainActivityImpl, "为了软件正常运行，请允许申请的权限！", "警告")
                     } else {
                         finish()
                     }
@@ -322,9 +326,8 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         }
     }
 
-    fun showWarnDialog() {
-        val dialog = CommonDialogFragment.newInstance("警告", "为了让软件正常工作，请您允许通过申请的权限，否则将无法提供服务！",
-                this)
+    override fun showWarnDialog(listener: CommonDialogListener, message: String, title: String) {
+        val dialog = CommonDialogFragment.newInstance(title, message, listener)
         dialog.show(fragmentManager, "tag")
     }
 
@@ -343,6 +346,15 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         hotWindow.setOnDismissListener {
             contentView.setBackgroundColor(Color.WHITE)
         }
+
+        //TODO 为什么不能lambdas
+        hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
+            override fun onClick(hotWord: String) {
+                val intent = Intent(this@MainActivityImpl,ISearchArticleActivityImpl::class.java)
+                intent.putExtra("search_key",hotWord)
+                presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
+            }
+        })
     }
 
     override fun hideHotWords() {
@@ -388,16 +400,14 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                     itemBannerV!!.viewpager_main!!.currentItem = ++itemBannerV!!.viewpager_main!!.currentItem
                 }
             }
-        }, 3000,3000)
+        }, 3000, 3000)
         itemBannerV!!.main_occupy.visibility = View.GONE
     }
 
     override fun createContentView(data: DataBean?) {
         if (data == null) {
-            val loadView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<ImageView>(R.id.article_item_load_more)
-            loadView.visibility = View.INVISIBLE
-            val loadErrView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<TextView>(R.id.article_item_load_more_error)
-            loadErrView.visibility = View.VISIBLE
+            hideLoadMoreView()
+            showLoadMoreErrorView()
             return
         }
         currentPage = data.curPage
@@ -410,6 +420,26 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         rcyvAdapter!!.notifyItemInserted(currentIndex)
         currentIndex += data.datas.size
         Log.i(TAG, "itemList size: ${itemList.size}")
+    }
+
+    override fun showLoadMoreView() {
+        val loadView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<ImageView>(R.id.article_item_load_more)
+        loadView.visibility = View.VISIBLE
+    }
+
+    override fun hideLoadMoreView() {
+        val loadView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<ImageView>(R.id.article_item_load_more)
+        loadView.visibility = View.INVISIBLE
+    }
+
+    override fun showLoadMoreErrorView() {
+        val loadErrView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<TextView>(R.id.article_item_load_more_error)
+        loadErrView.visibility = View.VISIBLE
+    }
+
+    override fun hideLoadMoreErrorView() {
+        val loadErrView = recycler_view_main.getChildAt(recycler_view_main.childCount - 1).findViewById<TextView>(R.id.article_item_load_more_error)
+        loadErrView.visibility = View.INVISIBLE
     }
 }
 

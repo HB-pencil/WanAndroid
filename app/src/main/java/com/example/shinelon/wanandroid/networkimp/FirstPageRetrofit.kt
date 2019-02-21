@@ -6,8 +6,7 @@ import com.example.shinelon.wanandroid.modle.HotWord
 import io.reactivex.Observable
 import io.reactivex.Observer
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.*
 
 /**
  * Created by Shinelon on 2018/4/28. 首页相关的请求接口
@@ -23,6 +22,13 @@ interface FirstPageRetrofit {
      */
     @GET("/article/list/{pageNum}/json")
     fun getArticle(@Path("pageNum") pageNum: Int): Observable<Articles>
+
+    /**
+     * 搜索文章
+     */
+    @POST("/article/query/{pageNum}/json")
+    @FormUrlEncoded
+    fun getArticleSearch(@Path("pageNum") pageNum: Int,@Field("k") k: String): Observable<Articles>
 
     /**
      * 首页banner
@@ -50,8 +56,4 @@ interface FirstPageRetrofit {
      */
     @GET("/hotkey/json")
     fun getHotWord(): Observable<HotWord>
-
-    /**
-     *
-     */
 }

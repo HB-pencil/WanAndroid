@@ -9,17 +9,14 @@ import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.modle.loginout.LoginRsp
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
-import com.example.shinelon.wanandroid.utils.CookieUtil
-import com.example.shinelon.wanandroid.utils.PreferenceUtil
+import com.example.shinelon.wanandroid.utils.CookieUtils
+import com.example.shinelon.wanandroid.utils.PreferenceUtils
 import com.example.shinelon.wanandroid.viewimp.ILoginActivityView
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
-import java.lang.Exception
-import java.lang.StringBuilder
-import java.util.*
 
 class LoginActivityPresenter : AbsPresenter<ILoginActivityView>() {
     val TAG = "LoginActivityPresenter"
@@ -44,10 +41,12 @@ class LoginActivityPresenter : AbsPresenter<ILoginActivityView>() {
                         Log.d(TAG, "onNext -> errorCode:" + response.body()!!.errorCode)
                         if (response.body()!!.errorCode >= 0) {
                             view?.showSuccess("登录成功！")
-                            jumpToTarget(ActionFlag.HOME)
+                            var intent = Intent(view!!.getActivityContext(), RegisterActivityImpl::class.java)
+                            jumpToTarget(ActionFlag.HOME,intent)
                             UserInfo.INSTANCE.userName = getAccount()
-                            CookieUtil.initCookie(response)
-                            CookieUtil.isSaveCookies(CookieUtil.isAutoLogin())
+                            UserInfo.INSTANCE.isOnline = true
+                            CookieUtils.initCookie(response)
+                            CookieUtils.isSaveCookies(CookieUtils.isAutoLogin())
                         } else {
                             view?.showError(response.body()?.errorMsg?:"登录失败！")
                         }
@@ -71,11 +70,9 @@ class LoginActivityPresenter : AbsPresenter<ILoginActivityView>() {
 
 
 
-    override fun jumpToTarget(flag: ActionFlag) {
+    override fun jumpToTarget(flag: ActionFlag,intent: Intent) {
         val context = view?.getActivityContext()
-        var intent = Intent(context, RegisterActivityImpl::class.java)
         if(flag  == ActionFlag.HOME) {
-            intent = Intent(context,MainActivityImpl::class.java)
             intent.putExtra("name",getAccount())
             intent.putExtra("isOnline",true)
         }
@@ -84,7 +81,7 @@ class LoginActivityPresenter : AbsPresenter<ILoginActivityView>() {
     }
 
     fun saveAutoLoginState(isAuto: Boolean){
-        val spUtil = PreferenceUtil.getInstance()
+        val spUtil = PreferenceUtils.getInstance()
         spUtil.putBoolean("isAuto",isAuto)
         spUtil.commit()
         Log.d(TAG,"是否自动登录：$isAuto")

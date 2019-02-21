@@ -2,28 +2,27 @@ package com.example.shinelon.wanandroid.presenter
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import android.view.View
 import com.example.shinelon.wanandroid.CommonWebViewActivity
 import com.example.shinelon.wanandroid.LoginActivityImpl
 import com.example.shinelon.wanandroid.UserInfo
+import com.example.shinelon.wanandroid.fragment.CommonDialogFragment
+import com.example.shinelon.wanandroid.fragment.CommonDialogListener
 import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.helper.toast
 import com.example.shinelon.wanandroid.modle.Articles
 import com.example.shinelon.wanandroid.modle.Banner
-import com.example.shinelon.wanandroid.modle.DatasBean
 import com.example.shinelon.wanandroid.modle.HotWord
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
-import com.example.shinelon.wanandroid.utils.PreferenceUtil
+import com.example.shinelon.wanandroid.utils.NetWorkUtils
+import com.example.shinelon.wanandroid.utils.PreferenceUtils
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.annotations.Nullable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
@@ -31,7 +30,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
+class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogListener {
     var view: IMainActivityView? = null
     val TAG = "MainActivityPresenter"
     override fun addView(v: IMainActivityView) {
@@ -57,7 +56,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
     }
 
     fun checkAutoLogin() {
-        val spUtli = PreferenceUtil.getInstance()
+        val spUtli = PreferenceUtils.getInstance()
         val isAuto = spUtli.getBoolean("isAuto")
         val expireTime = spUtli.getLong("expireTime")
         val userName = spUtli.getString("username")
@@ -90,7 +89,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                         }
                     })
         } else if (isAuto) {
-            val spUtil = PreferenceUtil()
+            val spUtil = PreferenceUtils()
             spUtil.putString("cookie")
             spUtil.putLong("expireTime", Long.MIN_VALUE)
             spUtil.putBoolean("isAuto", false)
@@ -100,20 +99,22 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
         Log.w(TAG, "保存的cookie:$cookie\n保存的时间:$expireTime")
     }
 
-    override fun jumpToTarget(flag: ActionFlag) {
-        if (flag != ActionFlag.LOGIN) return
+    override fun jumpToTarget(flag: ActionFlag,intent: Intent) {
+        if (flag != ActionFlag.LOGIN && flag != ActionFlag.SEARCH) return
+        Log.d(TAG,"jumpToTarget")
         val context = view!!.getActivityContext()
-        val intent = Intent(context, LoginActivityImpl::class.java)
         context.startActivity(intent)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     fun login() {
-        jumpToTarget(ActionFlag.LOGIN)
+        val context = view!!.getActivityContext()
+        val intent = Intent(context, LoginActivityImpl::class.java)
+        jumpToTarget(ActionFlag.LOGIN,intent)
     }
 
     fun logout() {
-        val spUtil = PreferenceUtil.getInstance()
+        val spUtil = PreferenceUtils.getInstance()
         spUtil.putString("username")
         spUtil.putString("cookie")
         spUtil.putLong("expireTime")
@@ -221,6 +222,21 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                         view?.createContentView(null)
                     }
                 })
+    }
+
+    fun checkNetworkState(){
+        val res = NetWorkUtils.isNetWorkAvailable(view!!.getActivityContext())
+        if (!res){
+            view?.showWarnDialog(this,"检测不到可用网络，请确保网络通畅！","警告")
+        }
+    }
+
+    override fun onPositiveClick() {
+        return
+    }
+
+    override fun onNegativeClick() {
+        view?.getActivityContext()?.finish()
     }
 
     fun loadWeb(url: String){

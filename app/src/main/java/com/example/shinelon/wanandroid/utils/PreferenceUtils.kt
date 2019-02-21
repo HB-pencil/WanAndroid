@@ -3,12 +3,12 @@ package com.example.shinelon.wanandroid.utils
 import android.preference.PreferenceManager
 import com.example.shinelon.wanandroid.MyApplication
 
-class PreferenceUtil{
+class PreferenceUtils{
     private val  preferenceManager = PreferenceManager.getDefaultSharedPreferences(MyApplication.getAppContext())
     private val editor = preferenceManager.edit()
 
     companion object {
-        fun getInstance() = PreferenceUtil()
+        fun getInstance() = PreferenceUtils()
     }
     fun putString(key: String,value: String = "") = editor.putString(key,value)
 

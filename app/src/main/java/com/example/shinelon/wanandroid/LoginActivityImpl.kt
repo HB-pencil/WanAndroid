@@ -1,5 +1,6 @@
 package com.example.shinelon.wanandroid
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -27,7 +28,8 @@ class LoginActivityImpl:AppCompatActivity(),ILoginActivityView {
             _, isChecked -> presenter?.saveAutoLoginState(isChecked)
         }
         register_tv.setOnClickListener {
-            presenter?.jumpToTarget(ActionFlag.REGISTER)
+            intent = Intent(this,MainActivityImpl::class.java)
+            presenter?.jumpToTarget(ActionFlag.REGISTER,intent)
         }
     }
 

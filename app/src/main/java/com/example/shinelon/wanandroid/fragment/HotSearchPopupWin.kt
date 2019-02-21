@@ -22,6 +22,8 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
         animationStyle = R.style.HotSearchWindowsAnim
     }
 
+    var listener: HotSearchPopupWinListener? = null
+
     /**
      * 每次添加两个搜索热词
      * @param word1 搜索热词1
@@ -65,9 +67,13 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
         showAsDropDown(view)
     }
 
+    fun addClickListener(listener: HotSearchPopupWinListener){
+        this.listener = listener
+    }
+
     override fun onClick(v: View?) {
-        //TODO 搜索热词网络
-        toast(context,"点击${v?.id}")
+        val view = v as? Button
+        listener?.onClick(view?.text.toString())
     }
 
     fun getRandomColor(): Int{
@@ -80,5 +86,9 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
             else -> res = Color.MAGENTA
         }
         return res
+    }
+
+    interface HotSearchPopupWinListener{
+        fun onClick(hotWord: String)
     }
 }

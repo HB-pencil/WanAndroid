@@ -1,5 +1,9 @@
 package com.example.shinelon.wanandroid.viewimp
 
-interface ISearchArticleActivityView: IView{
+import com.example.shinelon.wanandroid.modle.DataBean
 
+interface ISearchArticleActivityView: IView{
+    fun showLoadingView()
+    fun hideLoadingView()
+    fun createContentView(dataBean: DataBean?)
 }

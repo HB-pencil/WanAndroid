@@ -8,6 +8,7 @@ class UserInfo private constructor() {
     var isAuto = false
     var cookie: String = ""
     var expire: Long = Long.MIN_VALUE
+    var isOnline: Boolean = false
 
     companion object {
         val INSTANCE by lazy (LazyThreadSafetyMode.SYNCHRONIZED){

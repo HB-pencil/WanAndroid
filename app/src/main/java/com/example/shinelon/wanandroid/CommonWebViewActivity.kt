@@ -1,5 +1,6 @@
 package com.example.shinelon.wanandroid
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.opengl.Visibility
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.FrameLayout
+import com.example.shinelon.wanandroid.helper.toast
 import kotlinx.android.synthetic.main.activity_common_web.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 
@@ -99,6 +101,18 @@ class CommonWebViewActivity: AppCompatActivity(){
             }
         }
         webView!!.loadUrl(url)
+
+        article_collect_btn.setOnClickListener {
+            if (!UserInfo.INSTANCE.isOnline) {
+                //TODO 此处为什么可以 this
+                val intent = Intent(this,LoginActivityImpl::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                toast(this,"请先登录")
+            } else {
+
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
