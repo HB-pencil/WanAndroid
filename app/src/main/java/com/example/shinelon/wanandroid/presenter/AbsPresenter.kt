@@ -8,7 +8,7 @@ import io.reactivex.annotations.Nullable
 /**
  * Created by Shinelon on 2018/4/28.
  */
-abstract class AbsPresenter<IView>{
+abstract class AbsPresenter<in IView>{
     /**
      * 添加视图activity或者fragment
      */

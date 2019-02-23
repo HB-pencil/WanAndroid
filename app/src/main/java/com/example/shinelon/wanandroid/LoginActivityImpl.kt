@@ -28,7 +28,7 @@ class LoginActivityImpl:AppCompatActivity(),ILoginActivityView {
             _, isChecked -> presenter?.saveAutoLoginState(isChecked)
         }
         register_tv.setOnClickListener {
-            intent = Intent(this,MainActivityImpl::class.java)
+            intent = Intent(this,RegisterActivityImpl::class.java)
             presenter?.jumpToTarget(ActionFlag.REGISTER,intent)
         }
     }

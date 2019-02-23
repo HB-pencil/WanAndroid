@@ -41,7 +41,7 @@ class LoginActivityPresenter : AbsPresenter<ILoginActivityView>() {
                         Log.d(TAG, "onNext -> errorCode:" + response.body()!!.errorCode)
                         if (response.body()!!.errorCode >= 0) {
                             view?.showSuccess("登录成功！")
-                            var intent = Intent(view!!.getActivityContext(), RegisterActivityImpl::class.java)
+                            var intent = Intent(view!!.getActivityContext(), MainActivityImpl::class.java)
                             jumpToTarget(ActionFlag.HOME,intent)
                             UserInfo.INSTANCE.userName = getAccount()
                             UserInfo.INSTANCE.isOnline = true

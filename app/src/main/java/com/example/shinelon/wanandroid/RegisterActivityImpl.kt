@@ -1,6 +1,5 @@
 package com.example.shinelon.wanandroid
 
-import android.app.Activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.example.shinelon.wanandroid.helper.toast

@@ -157,73 +157,6 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
                 })
     }
 
-    fun getBanner() {
-        RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
-                .getBanner()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Banner> {
-                    override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG, "获取banner onSubscribe()")
-                    }
-
-                    override fun onNext(t: Banner) {
-                        Log.d(TAG, "获取Banner onNext")
-                        if (t.errorCode >= 0) {
-                            view?.createBannerView(t.data)
-                        } else {
-                            view?.createBannerView(mutableListOf())
-                        }
-                    }
-
-                    override fun onComplete() {
-                        Log.d(TAG, "获取Banner onComplete")
-                    }
-
-                    override fun onError(e: Throwable) {
-                        Log.e(TAG, "获取Banner onError $e")
-                        view?.createBannerView(mutableListOf())
-                    }
-                })
-    }
-
-    fun onPageItemClick(url: String) {
-        loadWeb(url)
-    }
-
-    /**
-     * 负责拿到网络请求结果给View，不用关心view怎么刷新UI
-     */
-    fun getArticleList(num: Int = 0) {
-        RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
-                .getArticle(num)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Articles> {
-                    override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG, "获取文章 onSubscribe")
-                    }
-
-                    override fun onNext(t: Articles) {
-                        Log.d(TAG, "获取文章 onNext")
-                        if (t.errorCode >= 0) {
-                            view?.createContentView(t.data)
-                        } else {
-                            view?.createContentView(null)
-                        }
-                    }
-
-                    override fun onComplete() {
-                        Log.d(TAG, "获取文章 onComplete")
-                    }
-
-                    override fun onError(e: Throwable) {
-                        Log.e(TAG, "获取文章 $e")
-                        view?.createContentView(null)
-                    }
-                })
-    }
-
     fun checkNetworkState(){
         val res = NetWorkUtils.isNetWorkAvailable(view!!.getActivityContext())
         if (!res){
@@ -237,13 +170,5 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
 
     override fun onNegativeClick() {
         view?.getActivityContext()?.finish()
-    }
-
-    fun loadWeb(url: String){
-        val context = view!!.getActivityContext()
-        val intent = Intent(context,CommonWebViewActivity::class.java)
-        intent.putExtra("web_url",url)
-        context.startActivity(intent)
-        context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }
