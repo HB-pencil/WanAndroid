@@ -19,13 +19,13 @@ import com.example.shinelon.wanandroid.helper.BaseAdapter
 import com.example.shinelon.wanandroid.helper.BaseViewHolder
 import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DatasBean
-import com.example.shinelon.wanandroid.presenter.ISearchArticleActivityPresenter
+import com.example.shinelon.wanandroid.presenter.SearchArticleActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.ISearchArticleActivityView
 import kotlinx.android.synthetic.main.activity_article_search.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 
-class ISearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView{
-    var presenter: ISearchArticleActivityPresenter? = null
+class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView{
+    var presenter: SearchArticleActivityPresenter? = null
     val TAG = "ISearchArticleActivityP"
     val itemList = mutableListOf<Any>()
     private var currentPage = 0
@@ -127,7 +127,7 @@ class ISearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityVie
     }
 
     override fun setPresenter() {
-        presenter = ISearchArticleActivityPresenter()
+        presenter = SearchArticleActivityPresenter()
         presenter?.addView(this)
     }
 

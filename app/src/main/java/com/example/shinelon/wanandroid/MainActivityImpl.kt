@@ -9,16 +9,15 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
-import com.example.shinelon.wanandroid.fragment.CommonDialogFragment
-import com.example.shinelon.wanandroid.fragment.CommonDialogListener
-import com.example.shinelon.wanandroid.fragment.HotSearchPopupWin
-import com.example.shinelon.wanandroid.fragment.IHomeFragmentImpl
+import com.example.shinelon.wanandroid.fragment.*
 import com.example.shinelon.wanandroid.helper.*
 import com.example.shinelon.wanandroid.presenter.MainActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
@@ -30,23 +29,23 @@ import kotlinx.android.synthetic.main.header_layout_main.view.*
 class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener,
         CommonDialogListener {
     private val TAG = "MainActivityImpl"
-
     private var presenter: MainActivityPresenter? = null
     private var mWindow: HotSearchPopupWin? = null
+    private var ft: FragmentTransaction? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.btn_home -> {
-
+                showCurrentFragment(FragmentTag.HOME.tag)
             }
             R.id.btn_struct -> {
-
+                showCurrentFragment(FragmentTag.STRUCT.tag)
             }
             R.id.btn_project -> {
-
+                showCurrentFragment(FragmentTag.PROJECT.tag)
             }
             R.id.btn_nav -> {
-
+                showCurrentFragment(FragmentTag.NAVIGATE.tag)
             }
         }
         true
@@ -102,7 +101,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         NavigationViewhelper.disableShiftMode(navigation_bottom)
 
-        showCurrentFragment("HOME")
+        showCurrentFragment(FragmentTag.HOME.tag)
     }
 
     override fun onResume() {
@@ -114,13 +113,43 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     }
 
     fun showCurrentFragment(fragmentTag: String){
+        toolbar_base.title = fragmentTag
+        val ft = supportFragmentManager.beginTransaction()
+
+        hideAllFragments(ft)//开启事务
         var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
         if (fragment == null){
-            fragment = IHomeFragmentImpl.getInstance(null)
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.fragment_container,fragment,fragmentTag)
-                    .commit()
+            fragment = getTargetFragment(fragmentTag)
+            ft?.add(R.id.fragment_container,fragment,fragmentTag)
+            ft?.show(fragment)
+        }else {
+            ft?.show(fragment)
+            Log.i(TAG,"$fragmentTag fragment已经存在")
         }
+        ft?.commit()
+    }
+
+    fun getTargetFragment(fragmentTag: String): Fragment{
+        when(fragmentTag){
+            FragmentTag.STRUCT.tag -> return IStructFragmentImpl.getInstance(null)
+            FragmentTag.PROJECT.tag -> return IProjectFragmentImpl.getInstance(null)
+            FragmentTag.NAVIGATE.tag -> return INavigateFragmentImpl.getInstance(null)
+            else -> return IHomeFragmentImpl.getInstance(null)
+        }
+    }
+
+    fun hideAllFragments(ft: FragmentTransaction){
+        val home = supportFragmentManager.findFragmentByTag(FragmentTag.HOME.tag)
+        if (home != null) ft.hide(home)
+
+        val struct = supportFragmentManager.findFragmentByTag(FragmentTag.STRUCT.tag)
+        if (struct != null) ft.hide(struct)
+
+        val project = supportFragmentManager.findFragmentByTag(FragmentTag.PROJECT.tag)
+        if (project != null) ft.hide(project)
+
+        val navigate = supportFragmentManager.findFragmentByTag(FragmentTag.NAVIGATE.tag)
+        if (navigate != null) ft.hide(navigate)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -134,7 +163,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val intent = Intent(this@MainActivityImpl, ISearchArticleActivityImpl::class.java)
+                val intent = Intent(this@MainActivityImpl, SearchArticleActivityImpl::class.java)
                 intent.putExtra("search_key", query)
                 presenter?.jumpToTarget(ActionFlag.SEARCH, intent)
                 return true
@@ -246,7 +275,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         //TODO 为什么不能lambdas
         hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
             override fun onClick(hotWord: String) {
-                val intent = Intent(this@MainActivityImpl,ISearchArticleActivityImpl::class.java)
+                val intent = Intent(this@MainActivityImpl,SearchArticleActivityImpl::class.java)
                 intent.putExtra("search_key",hotWord)
                 presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
             }

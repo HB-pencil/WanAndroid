@@ -13,7 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class ISearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>(){
+class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>(){
     var view: ISearchArticleActivityView? =null
     val TAG = "ISearchArticleActivityP"
     override fun addView(view: ISearchArticleActivityView) {

@@ -15,7 +15,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class IHomeFragmentPresenter: AbsPresenter<IHomeFragmentView>() {
+class HomeFragmentPresenter: AbsPresenter<IHomeFragmentView>() {
     var view: IHomeFragmentView? = null
     val TAG = "MainActivityPresenter"
     override fun addView(v: IHomeFragmentView) {

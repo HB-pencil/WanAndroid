@@ -22,15 +22,14 @@ import com.example.shinelon.wanandroid.helper.ViewPagerAdapter
 import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DataBeanBanner
 import com.example.shinelon.wanandroid.modle.DatasBean
-import com.example.shinelon.wanandroid.presenter.IHomeFragmentPresenter
+import com.example.shinelon.wanandroid.presenter.HomeFragmentPresenter
 import com.example.shinelon.wanandroid.viewimp.IHomeFragmentView
 import kotlinx.android.synthetic.main.article_item_banner.view.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.view_pager_item.view.*
 import java.util.*
 
 class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
-    var presenter: IHomeFragmentPresenter? = null
+    var presenter: HomeFragmentPresenter? = null
     val TAG = "IHomeFragmentImpl"
     private val viewList = mutableListOf<View>()
     private val itemList = mutableListOf<Any>()
@@ -54,7 +53,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     override fun getLayoutId(id: Int) = R.layout.fragment_home
 
     override fun setPresenter() {
-        presenter = IHomeFragmentPresenter()
+        presenter = HomeFragmentPresenter()
         presenter?.addView(this)
     }
 
