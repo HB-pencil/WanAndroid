@@ -43,28 +43,31 @@ class CommonWebViewActivity: AppCompatActivity(){
         }
 
         val url = intent.getStringExtra("web_url")
+        val isCollected = intent.getBooleanExtra("collect_state",false)
+        if (isCollected) article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collected_art,theme))
         Log.d(TAG,url)
 
         webView!!.webViewClient = object : WebViewClient(){
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
                 progress_bar.visibility = View.VISIBLE
-                load_error.visibility = View.INVISIBLE
+                Log.d(TAG,"onPagedStarted")
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 progress_bar.visibility = View.GONE
+                Log.d(TAG,"onPagedFinished")
             }
 
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                 super.onReceivedError(view, request, error)
-                progress_bar.visibility = View.GONE
-                load_error.visibility = View.VISIBLE
+                Log.e(TAG,"onReceiveError $error")
             }
 
             override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
                 super.onReceivedHttpError(view, request, errorResponse)
+                Log.e(TAG,"onReceiveError $errorResponse")
             }
 
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -73,6 +76,7 @@ class CommonWebViewActivity: AppCompatActivity(){
 
             override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
                 super.onReceivedSslError(view, handler, error)
+                Log.e(TAG,"onReceiveError $error")
                 // TODO 证书验证
                 handler?.proceed()
             }
@@ -110,7 +114,11 @@ class CommonWebViewActivity: AppCompatActivity(){
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 toast(this,"请先登录")
             } else {
+                if (isCollected) {
 
+                }else {
+
+                }
             }
         }
     }

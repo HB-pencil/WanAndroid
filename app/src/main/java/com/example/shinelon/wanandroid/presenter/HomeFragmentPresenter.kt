@@ -60,8 +60,8 @@ class HomeFragmentPresenter: AbsPresenter<IHomeFragmentView>() {
                 })
     }
 
-    fun onPageItemClick(url: String) {
-        loadWeb(url)
+    fun onPageItemClick(url: String,collect: Boolean) {
+        loadWeb(url,collect)
     }
 
     /**
@@ -97,10 +97,11 @@ class HomeFragmentPresenter: AbsPresenter<IHomeFragmentView>() {
                 })
     }
 
-    fun loadWeb(url: String){
+    fun loadWeb(url: String,collect: Boolean){
         val context = view!!.getActivityContext()
         val intent = Intent(context, CommonWebViewActivity::class.java)
         intent.putExtra("web_url",url)
+        intent.putExtra("collect_state",collect)
         context.startActivity(intent)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }

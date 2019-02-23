@@ -9,7 +9,8 @@ class CustomInterceptor : Interceptor {
     val TAG = "CustomInterceptor"
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        if (UserInfo.INSTANCE.isAuto) {
+        //如果自动登录，那么必然是登录状态，登录状态都带上有效cookie
+        if (UserInfo.INSTANCE.isAuto || UserInfo.INSTANCE.isOnline) {
             request = request.newBuilder()
                     .addHeader("cookie", UserInfo.INSTANCE.cookie)
                     .build()

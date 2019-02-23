@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
@@ -31,7 +32,6 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     private val TAG = "MainActivityImpl"
     private var presenter: MainActivityPresenter? = null
     private var mWindow: HotSearchPopupWin? = null
-    private var ft: FragmentTransaction? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -54,10 +54,20 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.panel_collect_art -> {
+                if (!UserInfo.INSTANCE.isOnline){
+                    val intent = Intent(this,LoginActivityImpl::class.java)
+                    presenter?.jumpToTarget(ActionFlag.LOGIN,intent)
+                }else {
 
+                }
             }
             R.id.panel_love_web -> {
-                Color.GREEN
+                if (!UserInfo.INSTANCE.isOnline){
+                    val intent = Intent(this,LoginActivityImpl::class.java)
+                    presenter?.jumpToTarget(ActionFlag.LOGIN,intent)
+                }else {
+
+                }
             }
             R.id.panel_night_mode -> {
 
@@ -73,6 +83,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
         setSupportActionBar(toolbar_base)
+        supportActionBar?.title = FragmentTag.HOME.tag
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar_base, R.string.open_navigation, R.string.close_navigation)
         drawer_layout.addDrawerListener(toggle)
@@ -95,7 +106,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             }
             Log.d(TAG,"操作${stateTv.text}")
         }
-
+        presenter?.checkAutoLogin()
         navigation_view.setNavigationItemSelectedListener(this)
 
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -109,11 +120,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         if (drawer_layout.isDrawerOpen(Gravity.START)) {
             drawer_layout.closeDrawer(Gravity.START)
         }
-        presenter?.checkAutoLogin()
     }
 
     fun showCurrentFragment(fragmentTag: String){
-        toolbar_base.title = fragmentTag
+        supportActionBar?.title = fragmentTag
         val ft = supportFragmentManager.beginTransaction()
 
         hideAllFragments(ft)//开启事务
@@ -129,6 +139,9 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         ft?.commit()
     }
 
+    /**
+     * 新建Fragment
+     */
     fun getTargetFragment(fragmentTag: String): Fragment{
         when(fragmentTag){
             FragmentTag.STRUCT.tag -> return IStructFragmentImpl.getInstance(null)
@@ -212,8 +225,21 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         super.onNewIntent(intent)
         val name = intent?.getStringExtra("name")
         val isOnline = intent?.getBooleanExtra("isOnline", false)
+        val reCreate = intent?.getBooleanExtra("recreate",false)
         Log.d(TAG, "name:$name;isOnline:$isOnline")
         if (intent != null) updateHeaderView(isOnline!!, name)
+        if (reCreate != null && reCreate){
+            val ft = supportFragmentManager.beginTransaction()
+            //寻找原先存在的并移除，重新创建
+            var home = supportFragmentManager.findFragmentByTag(FragmentTag.HOME.tag)
+            if(home != null) {
+                ft.remove(home)
+                home = getTargetFragment(FragmentTag.HOME.tag)
+            }
+            ft.add(home,FragmentTag.HOME.tag)
+            ft.show(home)
+            ft.commit()
+        }
     }
 
     override fun onBackPressed() {

@@ -2,6 +2,7 @@ package com.example.shinelon.wanandroid.networkimp
 
 import com.example.shinelon.wanandroid.modle.Articles
 import com.example.shinelon.wanandroid.modle.Banner
+import com.example.shinelon.wanandroid.modle.CollectedArticles
 import com.example.shinelon.wanandroid.modle.HotWord
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -22,6 +23,12 @@ interface FirstPageRetrofit {
      */
     @GET("/article/list/{pageNum}/json")
     fun getArticle(@Path("pageNum") pageNum: Int): Observable<Articles>
+
+    /**
+     * 收藏文章列表
+     */
+    @GET("/lg/collect/list/{pageNum}/json")
+    fun getCollectedArtls(@Path("pageNum") pageNum: Int): Observable<CollectedArticles>
 
     /**
      * 搜索文章

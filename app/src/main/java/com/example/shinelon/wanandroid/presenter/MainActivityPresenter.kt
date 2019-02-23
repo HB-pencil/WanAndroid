@@ -89,6 +89,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
                         }
                     })
         } else if (isAuto) {
+            UserInfo.INSTANCE.isAuto = false
             val spUtil = PreferenceUtils()
             spUtil.putString("cookie")
             spUtil.putLong("expireTime", Long.MIN_VALUE)
@@ -163,6 +164,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
             view?.showWarnDialog(this,"检测不到可用网络，请确保网络通畅！","警告")
         }
     }
+
 
     override fun onPositiveClick() {
         return

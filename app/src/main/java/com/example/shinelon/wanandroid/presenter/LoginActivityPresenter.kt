@@ -42,6 +42,7 @@ class LoginActivityPresenter : AbsPresenter<ILoginActivityView>() {
                         if (response.body()!!.errorCode >= 0) {
                             view?.showSuccess("登录成功！")
                             var intent = Intent(view!!.getActivityContext(), MainActivityImpl::class.java)
+                            intent.putExtra("recreate",true)
                             jumpToTarget(ActionFlag.HOME,intent)
                             UserInfo.INSTANCE.userName = getAccount()
                             UserInfo.INSTANCE.isOnline = true

@@ -79,6 +79,7 @@ class RegisterActivityPresenter: AbsPresenter<IRegisterAvtivityView>(){
                             view?.showSuccess("登录成功！")
                             val context = view!!.getActivityContext()
                             val intent = Intent(context, MainActivityImpl::class.java)
+                            intent.putExtra("recreate",true)
                             jumpToTarget(ActionFlag.HOME,intent)
                             UserInfo.INSTANCE.userName = view?.getAccount()?:""
                             CookieUtils.initCookie(response)

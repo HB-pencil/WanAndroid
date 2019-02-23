@@ -28,6 +28,9 @@ import kotlinx.android.synthetic.main.article_item_banner.view.*
 import kotlinx.android.synthetic.main.view_pager_item.view.*
 import java.util.*
 
+/**
+ * 如果用户去登录了，那么应该重建fragment，请求的时候带上token
+ */
 class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     var presenter: HomeFragmentPresenter? = null
     val TAG = "IHomeFragmentImpl"
@@ -37,6 +40,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     private var vpAdapter: ViewPagerAdapter? = null
     private var itemBannerV: View? = null
     private var currentPage = 0
+    private var totalPage = 0
     private var rcyvAdapter: BaseAdapter? = null
     private var isLoading = false
     private var currentIndex = 1
@@ -70,6 +74,9 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
                     else -> {
                         val article = itemList[position] as DatasBean
                         holder.getChildView<TextView>(R.id.article_title_item).text = article.title
+                        holder.getChildView<ImageView>(R.id.article_status).
+                                setImageDrawable(if(article.collect) resources.getDrawable(R.drawable.love_red,activity?.theme)
+                                else resources.getDrawable(R.drawable.love_black, activity?.theme))
                         if (article.tags.size > 0) {
                             val sbf = StringBuffer()
                             article.tags.forEach {
@@ -99,7 +106,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
                 super.onItemClick(position)
                 if (position > 0 && position < itemList.size - 1) {
                     val item = itemList[position] as DatasBean
-                    presenter?.loadWeb(item.link)
+                    presenter?.loadWeb(item.link,item.collect)
                 }
             }
         }
@@ -122,7 +129,8 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
                 var loadView: ImageView? = null
                 var loadErrView: TextView? = null
                 if (dy > 0 && layoutManager.findFirstVisibleItemPosition() > 0 &&
-                        layoutManager.findLastVisibleItemPosition() == itemList.size - 1) {
+                        layoutManager.findLastVisibleItemPosition() == itemList.size - 1 &&
+                        currentPage +1 <= totalPage) {
                     loadView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more)
                     loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)
                     loadErrView?.visibility = View.INVISIBLE
@@ -175,7 +183,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
         //这里不能用lambdas，我佛了
         vpAdapter?.addItemClickListener(object : ViewPagerAdapter.OnItemClickListener {
             override fun onItemClick(realPosition: Int) {
-                presenter?.onPageItemClick(listBannerUrl[realPosition])
+                presenter?.onPageItemClick(listBannerUrl[realPosition],false)
             }
         })
         Timer().schedule(object : TimerTask() {
@@ -195,6 +203,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
             return
         }
         currentPage = data.curPage
+        totalPage = data.pageCount
         val articles = mutableListOf<DatasBean>()
         data.datas.forEach {
             articles.add(it)
