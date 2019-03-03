@@ -9,11 +9,9 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.Html
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewPropertyAnimator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -21,14 +19,14 @@ import com.example.shinelon.wanandroid.helper.BaseAdapter
 import com.example.shinelon.wanandroid.helper.BaseViewHolder
 import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DatasBean
-import com.example.shinelon.wanandroid.presenter.SearchArticleActivityPresenter
-import com.example.shinelon.wanandroid.viewimp.ISearchArticleActivityView
+import com.example.shinelon.wanandroid.presenter.CollectedActivityPresenter
+import com.example.shinelon.wanandroid.viewimp.ICollectedActivityView
 import kotlinx.android.synthetic.main.activity_article_search.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 
-class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView{
-    var presenter: SearchArticleActivityPresenter? = null
-    val TAG = "ISearchArticleActivityP"
+class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
+    var presenter: CollectedActivityPresenter? = null
+    val TAG = "CollectedActivityImpl"
     val itemList = mutableListOf<Any>()
     private var currentPage = 0
     private var currentIndex = 0
@@ -36,7 +34,6 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
     var adapter: BaseAdapter? = null
     var isExecute = false
     var isLoading = false
-    var k: String = "android"
     private var nowClick: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +42,6 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
         setSupportActionBar(toolbar_base)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        k = intent.getStringExtra("search_key")?: "android"
         if (presenter == null) setPresenter()
 
         recycler_view_search.layoutManager = LinearLayoutManager(this)
@@ -64,22 +60,13 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
                     itemList.size-1 -> Unit
                     else -> {
                         val article = itemList[position] as DatasBean
-                        holder.getChildView<TextView>(R.id.article_title_item).text = Html.fromHtml(article.title)
-                        holder.getChildView<ImageView>(R.id.article_status).setImageDrawable(if (article.collect) resources.getDrawable(R.drawable.love_red, theme)
-                        else resources.getDrawable(R.drawable.love_black, theme))
-                        if (article.tags.size > 0) {
-                            val sbf = StringBuffer()
-                            article.tags.forEach {
-                                sbf.append("${it.name} ")
-                            }
-                            holder.getChildView<Button>(R.id.article_tags_item).text = sbf.toString()
-                            holder.getChildView<Button>(R.id.article_tags_item).visibility = View.VISIBLE
-                        } else {
-                            holder.getChildView<Button>(R.id.article_tags_item).visibility = View.INVISIBLE
-                        }
+                        holder.getChildView<TextView>(R.id.article_title_item).text = article.title
                         holder.getChildView<TextView>(R.id.author_item).text = article.author
-                        holder.getChildView<TextView>(R.id.article_category).text = "${article.superChapterName} ${article.chapterName}"
+                        holder.getChildView<TextView>(R.id.article_category).text = "${article.chapterName}"
                         holder.getChildView<TextView>(R.id.article_time).text = article.niceDate
+                        holder.getChildView<TextView>(R.id.time_occupy).text = "收藏时间"
+                        holder.getChildView<Button>(R.id.article_tags_item).visibility = View.GONE
+                        holder.getChildView<ImageView>(R.id.article_status).visibility = View.GONE
                     }
                 }
             }
@@ -89,7 +76,7 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
                 nowClick = position
                 if (position >= 0 && position < itemList.size-1) {
                     val item = itemList[position] as DatasBean
-                    presenter?.loadWeb(item.link,item.collect,item.id)
+                    presenter?.loadWeb(item.link,item.originId)
                 }
             }
         }
@@ -107,6 +94,7 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
                 if (dy > 0 && layoutManager.findFirstVisibleItemPosition() > 0 &&
                         layoutManager.findLastVisibleItemPosition() == itemList.size - 1 &&
                         currentPage + 1 <= totalPage) {
+                    Log.e(TAG,"$currentPage  $totalPage")
                     loadView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more)
                     loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)
                     loadErrView?.visibility = View.INVISIBLE
@@ -119,7 +107,7 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
                         loadView.visibility = View.VISIBLE
                         animator.start()
                         Handler().postDelayed({
-                            presenter?.getSearchArticle(currentPage++,k)
+                            presenter?.getCollectedArticles(currentPage++)
                         }, 500)
                         isLoading = true
                     }
@@ -130,11 +118,11 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
             }
         })
 
-        presenter?.getSearchArticle(currentPage,k)
+        presenter?.getCollectedArticles(currentPage)
     }
 
     override fun setPresenter() {
-        presenter = SearchArticleActivityPresenter()
+        presenter = CollectedActivityPresenter()
         presenter?.addView(this)
     }
 
@@ -186,21 +174,16 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            5 -> {
+            6 -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val result = data!!.getBooleanExtra("isCollected", false)
-                    if (nowClick >= 0) {
-                        changeLoveView(result)
-                        Log.i(TAG, "<<<<<<<信息已经得到更新>>>>>>>")
+                    if (!result) {
+                        itemList.removeAt(nowClick)
+                        adapter!!.notifyItemRemoved(nowClick)
+                        Log.i(TAG, "<<<<<<<信息已经得到更新>>>>>>> ")
                     }
                 }
             }//最新文章页
         }
-    }
-
-    override fun changeLoveView(isCollected: Boolean) {
-        val item = itemList[nowClick] as DatasBean
-        item.collect = isCollected
-        adapter?.notifyItemChanged(nowClick)
     }
 }

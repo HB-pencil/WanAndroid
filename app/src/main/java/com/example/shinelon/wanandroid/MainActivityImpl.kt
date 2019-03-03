@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.app.AppCompatDelegate
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
@@ -58,7 +59,8 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                     val intent = Intent(this,LoginActivityImpl::class.java)
                     presenter?.jumpToTarget(ActionFlag.LOGIN,intent)
                 }else {
-
+                    val intent = Intent(this,CollectedActivityImpl::class.java)
+                    presenter?.jumpToTarget(ActionFlag.COLLECT,intent)
                 }
             }
             R.id.panel_love_web -> {
@@ -70,7 +72,12 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                 }
             }
             R.id.panel_night_mode -> {
-
+                //TODO
+                if(AppCompatDelegate.getDefaultNightMode()== AppCompatDelegate.MODE_NIGHT_YES)
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                else
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                recreate()
             }
             R.id.panel_setting -> {
 

@@ -101,8 +101,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
     }
 
     override fun jumpToTarget(flag: ActionFlag,intent: Intent) {
-        if (flag != ActionFlag.LOGIN && flag != ActionFlag.SEARCH) return
-        Log.d(TAG,"jumpToTarget")
+        Log.d(TAG,"jumpToTarget ${flag.name}")
         val context = view!!.getActivityContext()
         context.startActivity(intent)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

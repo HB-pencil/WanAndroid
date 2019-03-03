@@ -1,5 +1,7 @@
 package com.example.shinelon.wanandroid
 
+import android.app.Activity
+import android.app.Fragment
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
@@ -13,13 +15,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.FrameLayout
+import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.modle.RequestResult
+import com.example.shinelon.wanandroid.networkimp.CollectStateRetrofit
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_common_web.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 
 class CommonWebViewActivity: AppCompatActivity(){
     val TAG = "CommonWebViewActivity"
     var webView: WebView? = null
+    var isCollected = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_common_web)
@@ -43,9 +54,12 @@ class CommonWebViewActivity: AppCompatActivity(){
         }
 
         val url = intent.getStringExtra("web_url")
-        val isCollected = intent.getBooleanExtra("collect_state",false)
+        isCollected = intent.getBooleanExtra("collect_state",false)
+        val id = intent.getLongExtra("id",-1)
         if (isCollected) article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collected_art,theme))
-        Log.d(TAG,url)
+        Log.d(TAG,"url:$url id:$id isCollect:$isCollected")
+
+        if(id<0) article_collect_btn.visibility = View.INVISIBLE
 
         webView!!.webViewClient = object : WebViewClient(){
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -115,9 +129,9 @@ class CommonWebViewActivity: AppCompatActivity(){
                 toast(this,"请先登录")
             } else {
                 if (isCollected) {
-
+                    cancelCollect(id)
                 }else {
-
+                    doCollect(id)
                 }
             }
         }
@@ -131,6 +145,17 @@ class CommonWebViewActivity: AppCompatActivity(){
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * WARNING: setResult()必须在finish()之前调用
+     */
+    override fun finish() {
+        val intent = Intent()
+        intent.putExtra("isCollected",isCollected)
+        setResult(Activity.RESULT_OK,intent)
+        Log.i(TAG,"回传：$isCollected")
+        super.finish()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         val parent = webView?.parent as ViewGroup
@@ -138,11 +163,81 @@ class CommonWebViewActivity: AppCompatActivity(){
         webView?.destroy()
     }
 
+
     override fun onBackPressed() {
         if(webView!!.canGoBack()){
             webView!!.goBack()
         }else {
             super.onBackPressed()
         }
+    }
+
+    /**
+     * 收藏或者取消收藏文章
+     */
+    fun doCollect(id: Long){
+        RetrofitClient.INSTANCE.retrofit.create(CollectStateRetrofit::class.java)
+                .doCollect(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<RequestResult>{
+                    override fun onSubscribe(d: Disposable) {
+                        Log.d(TAG,"onSubscribe")
+                    }
+
+                    override fun onNext(t: RequestResult) {
+                        if(t.errorCode>=0){
+                            toast(this@CommonWebViewActivity,"收藏成功")
+                            article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collected_art,theme))
+                            isCollected = true
+                        }else {
+                            toast(this@CommonWebViewActivity,"收藏失败，请重试")
+                            isCollected = false
+                        }
+                    }
+
+                    override fun onComplete() {
+                        Log.d(TAG,"onComplete")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.e(TAG,e.message)
+                        toast(this@CommonWebViewActivity,"收藏失败，请重试")
+                        isCollected = false
+                    }
+                })
+    }
+
+    fun cancelCollect(id: Long){
+        RetrofitClient.INSTANCE.retrofit.create(CollectStateRetrofit::class.java)
+                .cancelCocllect(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<RequestResult>{
+                    override fun onSubscribe(d: Disposable) {
+                        Log.d(TAG,"onSubscribe")
+                    }
+
+                    override fun onNext(t: RequestResult) {
+                        if(t.errorCode>=0){
+                            toast(this@CommonWebViewActivity,"取消收藏成功")
+                            article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collect_art,theme))
+                            isCollected = false
+                        }else {
+                            toast(this@CommonWebViewActivity,"取消收藏失败，请重试")
+                            isCollected = true
+                        }
+                    }
+
+                    override fun onComplete() {
+                        Log.d(TAG,"onComplete")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.e(TAG,e.message)
+                        toast(this@CommonWebViewActivity,"取消收藏失败，请重试")
+                        isCollected = true
+                    }
+                })
     }
 }

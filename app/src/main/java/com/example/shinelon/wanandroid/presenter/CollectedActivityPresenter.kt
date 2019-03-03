@@ -7,16 +7,16 @@ import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.modle.Articles
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
-import com.example.shinelon.wanandroid.viewimp.ISearchArticleActivityView
+import com.example.shinelon.wanandroid.viewimp.ICollectedActivityView
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>(){
-    var view: ISearchArticleActivityView? =null
+class CollectedActivityPresenter: AbsPresenter<ICollectedActivityView>() {
+    var view: ICollectedActivityView? = null
     val TAG = "ISearchArticleActivityP"
-    override fun addView(view: ISearchArticleActivityView) {
+    override fun addView(view: ICollectedActivityView) {
         this.view = view
     }
 
@@ -24,28 +24,29 @@ class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>()
 
     }
 
-    fun loadWeb(url: String,isCollected: Boolean,id: Long){
+    fun loadWeb(url: String,id: Long){
         val context = view!!.getActivityContext()
         val intent = Intent(context, CommonWebViewActivity::class.java)
         intent.putExtra("web_url",url)
+        //这里是 originId 也就是原始 id
         intent.putExtra("id",id)
-        intent.putExtra("collect_state",isCollected)
-        context.startActivityForResult(intent,5)
+        intent.putExtra("collect_state",true)
+        context.startActivityForResult(intent,6)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-    fun getSearchArticle(num: Int = 0,k: String){
+    fun getCollectedArticles(num: Int = 0){
         RetrofitClient.INSTANCE.retrofit.create(FirstPageRetrofit::class.java)
-                .getArticleSearch(num,k)
+                .getCollectedArtls(num)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Articles> {
                     override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG, "获取文章 onSubscribe")
+                        Log.d(TAG, "获取收藏文章 onSubscribe")
                     }
 
                     override fun onNext(t: Articles) {
-                        Log.d(TAG, "获取文章 onNext")
+                        Log.d(TAG, "获取收藏文章 onNext")
                         if (t.errorCode >= 0) {
                             view?.createContentView(t.data)
                         } else {
@@ -54,12 +55,12 @@ class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>()
                     }
 
                     override fun onComplete() {
-                        Log.d(TAG, "获取文章 onComplete")
+                        Log.d(TAG, "获取收藏文章 onComplete")
                         view?.createContentView(null)
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.e(TAG, "获取文章 $e")
+                        Log.e(TAG, "获取收藏文章 $e")
                     }
                 })
     }

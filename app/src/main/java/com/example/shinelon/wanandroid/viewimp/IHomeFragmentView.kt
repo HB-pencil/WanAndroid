@@ -1,5 +1,6 @@
 package com.example.shinelon.wanandroid.viewimp
 
+import android.support.v4.app.Fragment
 import com.example.shinelon.wanandroid.fragment.CommonDialogListener
 import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DataBeanBanner
@@ -14,4 +15,6 @@ interface IHomeFragmentView: IView {
     fun hideLoadMoreView()
     fun showLoadMoreErrorView()
     fun hideLoadMoreErrorView()
+    fun getPageFragment(): Fragment
+    fun changeLoveView(isCollected: Boolean)
 }

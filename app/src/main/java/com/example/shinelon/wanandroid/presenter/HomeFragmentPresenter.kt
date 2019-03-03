@@ -60,8 +60,8 @@ class HomeFragmentPresenter: AbsPresenter<IHomeFragmentView>() {
                 })
     }
 
-    fun onPageItemClick(url: String,collect: Boolean) {
-        loadWeb(url,collect)
+    fun onPageItemClick(url: String,collect: Boolean,id: Long) {
+        loadWeb(url,collect,id)
     }
 
     /**
@@ -97,12 +97,15 @@ class HomeFragmentPresenter: AbsPresenter<IHomeFragmentView>() {
                 })
     }
 
-    fun loadWeb(url: String,collect: Boolean){
+    fun loadWeb(url: String,collect: Boolean,id: Long){
         val context = view!!.getActivityContext()
         val intent = Intent(context, CommonWebViewActivity::class.java)
+        val fragment = view!!.getPageFragment()
         intent.putExtra("web_url",url)
         intent.putExtra("collect_state",collect)
-        context.startActivity(intent)
+        intent.putExtra("id",id)
+        //从fragment 启动
+        fragment.startActivityForResult(intent,1)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }

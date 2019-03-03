@@ -4,5 +4,6 @@ enum class ActionFlag {
     HOME,
     LOGIN,
     REGISTER,
-    SEARCH
+    SEARCH,
+    COLLECT
 }
