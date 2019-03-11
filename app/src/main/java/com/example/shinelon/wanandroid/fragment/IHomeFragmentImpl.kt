@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -61,7 +62,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
         }
     }
 
-    override fun getLayoutId(id: Int) = R.layout.fragment_home
+    override fun getLayoutId() = R.layout.fragment_home
 
     override fun setPresenter() {
         presenter = HomeFragmentPresenter()
@@ -119,6 +120,10 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
         }
         recyclerView?.layoutManager = LinearLayoutManager(activity)
         recyclerView?.adapter = rcyvAdapter
+
+        val resId = R.anim.animation_list
+        val animation = AnimationUtils.loadLayoutAnimation(activity,resId)
+        recyclerView?.layoutAnimation = animation
 
         Handler().postDelayed({
             presenter?.getBanner()
@@ -220,6 +225,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
         //插入数据源
         itemList.addAll(currentIndex, articles)
         rcyvAdapter!!.notifyItemInserted(currentIndex)
+        recyclerView!!.scheduleLayoutAnimation()
         currentIndex += data.datas.size
         Log.i(TAG, "itemList size: ${itemList.size}")
     }

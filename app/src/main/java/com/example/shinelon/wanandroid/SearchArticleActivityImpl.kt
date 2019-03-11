@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewPropertyAnimator
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -94,6 +95,10 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
             }
         }
         recycler_view_search.adapter = adapter
+        val resId = R.anim.animation_list
+        val animation = AnimationUtils.loadLayoutAnimation(this,resId)
+        recycler_view_search.layoutAnimation = animation
+
         showLoadingView()
 
         val layoutManager = recycler_view_search.layoutManager as LinearLayoutManager
@@ -179,6 +184,7 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
         //插入数据源
         itemList.addAll(currentIndex, articles)
         adapter!!.notifyItemInserted(currentIndex)
+        recycler_view_search.scheduleLayoutAnimation()
         currentIndex += dataBean.datas.size
         Log.i(TAG, "itemList size: ${itemList.size}")
     }

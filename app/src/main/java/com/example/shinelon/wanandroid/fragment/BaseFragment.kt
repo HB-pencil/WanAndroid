@@ -12,13 +12,13 @@ abstract class BaseFragment: Fragment(),IView{
     var rootView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_home,container,false)
+        val view = inflater.inflate(getLayoutId(),container,false)
         rootView = view
         init()
         return view
     }
 
-    abstract fun getLayoutId(id: Int): Int
+    abstract fun getLayoutId(): Int
     abstract fun init()
 
     override fun onCreate(savedInstanceState: Bundle?) {

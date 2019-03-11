@@ -119,6 +119,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         NavigationViewhelper.disableShiftMode(navigation_bottom)
 
+        initFragments()
         showCurrentFragment(FragmentTag.HOME.tag)
     }
 
@@ -144,6 +145,13 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             Log.i(TAG,"$fragmentTag fragment已经存在")
         }
         ft?.commit()
+    }
+
+    fun initFragments(){
+        getTargetFragment(FragmentTag.HOME.tag)
+        getTargetFragment(FragmentTag.STRUCT.tag)
+        getTargetFragment(FragmentTag.PROJECT.tag)
+        getTargetFragment(FragmentTag.NAVIGATE.tag)
     }
 
     /**
@@ -305,7 +313,6 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             contentView.setBackgroundColor(Color.WHITE)
         }
 
-        //TODO 为什么不能lambdas
         hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
             override fun onClick(hotWord: String) {
                 val intent = Intent(this@MainActivityImpl,SearchArticleActivityImpl::class.java)

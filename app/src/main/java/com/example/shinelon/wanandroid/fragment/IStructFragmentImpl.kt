@@ -17,7 +17,7 @@ class IStructFragmentImpl: BaseFragment(),IStructFragmentView {
         }
     }
 
-    override fun getLayoutId(id: Int) = R.layout.fragment_home
+    override fun getLayoutId() = R.layout.fragment_home
 
     override fun init() {
 
