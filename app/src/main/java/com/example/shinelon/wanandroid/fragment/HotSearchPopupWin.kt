@@ -81,7 +81,7 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
         when (res) {
             0 -> res = Color.BLUE
             1 -> res = Color.RED
-            2 -> res = Color.YELLOW
+            2 -> res = Color.CYAN
             3 -> res = Color.GREEN
             else -> res = Color.MAGENTA
         }

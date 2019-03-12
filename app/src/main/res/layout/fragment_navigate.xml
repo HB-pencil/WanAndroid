@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:padding="10dp">
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -16,7 +16,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:padding="5dp">
         </com.example.shinelon.wanandroid.customview.FlowLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
     <TextView
         android:id="@+id/navigate_error"
         android:layout_width="wrap_content"

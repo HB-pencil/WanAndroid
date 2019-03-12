@@ -3,6 +3,7 @@ package com.example.shinelon.wanandroid.fragment
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.example.shinelon.wanandroid.R
@@ -40,13 +41,14 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
     }
 
     override fun showWebSiteName(response: MutableList<NavigateData>) {
+        Log.d(TAG,"showWebSiteName")
         response.forEach {
             val title = TextView(context)
             val params = FlowLayout.FlowLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
             params.topMargin =  dpToPx(20F).toInt()
             params.bottomMargin = dpToPx(10F).toInt()
             title.setPadding(25,25,25,25)
-            title.textSize = dpToPx(20F)
+            title.textSize = dpToPx(25F)
             title.setTextColor(Color.BLACK)
             title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             title.layoutParams = params
@@ -60,8 +62,9 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
                 text.text = it.title
                 text.layoutParams = p
                 text.gravity = Gravity.CENTER
+                text.textSize = dpToPx(15F)
                 text.setTextColor(getRandomColor())
-                text.setPadding(10,10,10,10)
+                text.setPadding(15,10,15,10)
                 text.setBackgroundColor(Color.TRANSPARENT)
                 flowLayout?.addView(text)
                 val url = it.link
@@ -80,7 +83,7 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
         when (res) {
             0 -> res = Color.BLUE
             1 -> res = Color.RED
-            2 -> res = Color.YELLOW
+            2 -> res = Color.CYAN
             3 -> res = Color.GREEN
             else -> res = Color.MAGENTA
         }

@@ -9,17 +9,19 @@ import android.view.ViewGroup
  * 自定义流式布局
  */
 class FlowLayout : ViewGroup {
+    val TAG = "FlowLayout"
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attr: AttributeSet): this(context,attr,0)
     constructor(context: Context, attr: AttributeSet, defStyle: Int) : super(context, attr, defStyle)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
+        //super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val originWidth = MeasureSpec.getSize(widthMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         val originHeight = MeasureSpec.getSize(heightMeasureSpec)
+        Log.d(TAG,"originW:$originWidth originH:$originHeight")
 
         for (i in 0 until childCount) {
             //使用此方法才能正确测量margin。widthUsed等为一些限制因素，通常为0即可
@@ -29,10 +31,10 @@ class FlowLayout : ViewGroup {
         var width = 0 //最终宽度
         var height = 0 //最终高度
 
-        var cwSum = paddingLeft //当前行的宽度累加
+        var cwSum = paddingStart //当前行的宽度累加
         var wSum = 0 //最终行要确定的宽度
-        var cHeight = paddingTop //当前行内子View的高度
-        var hSum = 0 //最终ViewGroup的高度
+        var cHeight = 0 //当前行内子View的高度
+        var hSum = paddingTop //最终ViewGroup的高度
 
         //考虑都为AT_MOST时
         for (i in 0 until childCount) {
@@ -44,7 +46,7 @@ class FlowLayout : ViewGroup {
                 cwSum -= child.measuredWidth - params.leftMargin - params.rightMargin //还原当前行的宽度
                 wSum = if (cwSum > wSum) cwSum else wSum //取宽度最大的那行作为结果
 
-                cwSum = child.measuredWidth + params.leftMargin + params.rightMargin //新一行的当前宽度累加
+                cwSum = child.measuredWidth + params.leftMargin + params.rightMargin + paddingStart //新一行的当前宽度累加
                 hSum += cHeight // 换行才可以确定前一行的高度
                 cHeight = child.measuredHeight + params.topMargin + params.bottomMargin //新一行的当前高度
             } else {
@@ -53,7 +55,9 @@ class FlowLayout : ViewGroup {
                 cHeight = if (temp > cHeight) temp else cHeight
             }
         }
-        hSum += cHeight //记得还要加上最后一行高度
+        hSum += cHeight + paddingBottom //记得还要加上最后一行高度
+        wSum += paddingRight
+        Log.d(TAG,"hSum:$hSum wSum:$wSum")
 
         if (widthMode == MeasureSpec.AT_MOST) {
             width = wSum
@@ -64,11 +68,13 @@ class FlowLayout : ViewGroup {
         if (heightMode == MeasureSpec.AT_MOST) {
             height = hSum
         } else {
-            height = originHeight
+            //TODO 为啥这里ViewGroup wrap_content 是 EXACTLY并且还是0
+            //height = originHeight
+            height = hSum
         }
 
         setMeasuredDimension(width, height)
-        Log.d("MEASURE","width:$width  height:$height")
+        Log.d(TAG,"width:$width  height:$height")
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -76,7 +82,7 @@ class FlowLayout : ViewGroup {
         var top = 0
         var right = 0
         var bottom = 0
-        var cwSum = paddingLeft
+        var cwSum = paddingStart
         var cHeight = 0
         var sHeight = paddingTop
 
@@ -89,11 +95,11 @@ class FlowLayout : ViewGroup {
                 //cwSum -= child.measuredWidth + params.leftMargin + params.rightMargin
                 sHeight += cHeight
                 cHeight = child.measuredHeight + params.topMargin + params.bottomMargin
-                cwSum = child.measuredWidth + params.leftMargin + params.rightMargin + paddingLeft
+                cwSum = child.measuredWidth + params.leftMargin + params.rightMargin + paddingStart
 
-                left = params.leftMargin + paddingLeft
+                left = params.leftMargin + paddingStart
                 top = sHeight + params.topMargin
-                right = child.measuredWidth + params.leftMargin + paddingLeft
+                right = child.measuredWidth + params.leftMargin + paddingStart
                 bottom = top + child.measuredHeight
             } else {
                 val temp = child.measuredHeight + params.topMargin + params.bottomMargin
@@ -105,8 +111,9 @@ class FlowLayout : ViewGroup {
                 bottom = top + child.measuredHeight
             }
             child.layout(left, top, right, bottom)
-            Log.d("CHILD", "l:$left  top:$top  right:$right  bottom:$bottom")
+            Log.d(TAG, "left:$left  top:$top  right:$right  bottom:$bottom")
         }
+        sHeight += cHeight + paddingBottom
     }
 
     /**

@@ -62,6 +62,7 @@ class NavigatePresenter: AbsPresenter<INavigateFragmentView>() {
     fun loadWeb(url: String){
         val context = view!!.getActivityContext()
         val intent = Intent(context, CommonWebViewActivity::class.java)
+        intent.putExtra("web_url",url)
         context.startActivity(intent)
         context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }

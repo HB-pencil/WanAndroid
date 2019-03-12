@@ -119,8 +119,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         NavigationViewhelper.disableShiftMode(navigation_bottom)
 
-        initFragments()
-        showCurrentFragment(FragmentTag.HOME.tag)
+        initFragments() //初始化
     }
 
     override fun onResume() {
@@ -148,10 +147,23 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     }
 
     fun initFragments(){
-        getTargetFragment(FragmentTag.HOME.tag)
-        getTargetFragment(FragmentTag.STRUCT.tag)
-        getTargetFragment(FragmentTag.PROJECT.tag)
-        getTargetFragment(FragmentTag.NAVIGATE.tag)
+        val map = mutableMapOf<String,Fragment>()
+        val fm = supportFragmentManager
+        map[FragmentTag.HOME.tag] = fm.findFragmentByTag(FragmentTag.HOME.tag)?:getTargetFragment(FragmentTag.HOME.tag)
+        map[FragmentTag.STRUCT.tag] = fm.findFragmentByTag(FragmentTag.STRUCT.tag)?:getTargetFragment(FragmentTag.STRUCT.tag)
+        map[FragmentTag.PROJECT.tag] = fm.findFragmentByTag(FragmentTag.PROJECT.tag)?:getTargetFragment(FragmentTag.PROJECT.tag)
+        map[FragmentTag.NAVIGATE.tag] = fm.findFragmentByTag(FragmentTag.NAVIGATE.tag)?:getTargetFragment(FragmentTag.NAVIGATE.tag)
+        val ft = fm.beginTransaction()
+        map.forEach {
+            ft.add(R.id.fragment_container,it.value,it.key)
+            if (it.value.tag == FragmentTag.HOME.tag) {
+                ft.show(it.value)
+                supportActionBar?.title = FragmentTag.HOME.tag
+            } else {
+                ft.hide(it.value)
+            }
+        }
+        ft.commit()
     }
 
     /**
