@@ -15,7 +15,7 @@ import io.reactivex.schedulers.Schedulers
 
 class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>(){
     var view: ISearchArticleActivityView? =null
-    val TAG = "ISearchArticleActivityP"
+    val TAG = "SearchArticleActivityP"
     override fun addView(view: ISearchArticleActivityView) {
         this.view = view
     }
@@ -50,15 +50,16 @@ class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>()
                             view?.createContentView(t.data)
                         } else {
                             view?.createContentView(null)
+                            Log.e(TAG,t.errorMessage)
                         }
                     }
 
                     override fun onComplete() {
                         Log.d(TAG, "获取文章 onComplete")
-                        view?.createContentView(null)
                     }
 
                     override fun onError(e: Throwable) {
+                        view?.createContentView(null)
                         Log.e(TAG, "获取文章 $e")
                     }
                 })

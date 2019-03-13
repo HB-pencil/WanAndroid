@@ -21,7 +21,7 @@ class RetrofitClient private constructor(){
             .build()
 
     val retrofit = Retrofit.Builder()
-            .baseUrl("http://www.wanandroid.com/")
+            .baseUrl("https://www.wanandroid.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(client)

@@ -7,4 +7,6 @@ interface ISearchArticleActivityView: IView{
     fun hideLoadingView()
     fun createContentView(dataBean: DataBean?)
     fun changeLoveView(isCollected: Boolean)
+    fun showErrorView()
+    fun hideErrorView()
 }

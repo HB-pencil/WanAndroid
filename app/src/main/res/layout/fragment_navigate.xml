@@ -2,18 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:padding="10dp">
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="match_parent">
         <com.example.shinelon.wanandroid.customview.FlowLayout
             android:id="@+id/navigate_flowLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:padding="5dp">
         </com.example.shinelon.wanandroid.customview.FlowLayout>
     </android.support.v4.widget.NestedScrollView>

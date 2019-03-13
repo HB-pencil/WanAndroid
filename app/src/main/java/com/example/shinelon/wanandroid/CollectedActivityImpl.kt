@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -82,6 +83,10 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
         }
         recycler_view_search.adapter = adapter
         showLoadingView()
+
+        val resId = R.anim.animation_list
+        val animation = AnimationUtils.loadLayoutAnimation(this,resId)
+        recycler_view_search.layoutAnimation = animation
 
         val layoutManager = recycler_view_search.layoutManager as LinearLayoutManager
         recycler_view_search.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -167,6 +172,7 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
         //插入数据源
         itemList.addAll(currentIndex, articles)
         adapter!!.notifyItemInserted(currentIndex)
+        recycler_view_search.scheduleLayoutAnimation()
         currentIndex += dataBean.datas.size
         Log.i(TAG, "itemList size: ${itemList.size}")
     }

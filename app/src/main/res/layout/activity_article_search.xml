@@ -22,5 +22,12 @@
             android:src="@drawable/load_more"
             android:scaleType="fitCenter"
             android:visibility="invisible"/>
+        <TextView
+            android:id="@+id/article_search_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/load_error"
+            android:visibility="invisible"/>
     </FrameLayout>
 </LinearLayout>

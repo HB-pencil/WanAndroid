@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.activity_toolbar.*
 
 class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView{
     var presenter: SearchArticleActivityPresenter? = null
-    val TAG = "ISearchArticleActivityP"
+    val TAG = "SearchArticleActivityP"
     val itemList = mutableListOf<Any>()
     private var currentPage = 0
     private var currentIndex = 0
@@ -39,6 +39,7 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
     var isLoading = false
     var k: String = "android"
     private var nowClick: Int = -1
+    var animate: ObjectAnimator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,14 +156,14 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
 
     override fun showLoadingView() {
         article_search_load.visibility = View.VISIBLE
-        article_search_load.animate()
-                .rotation(360F)
-                .setDuration(60000)
-                .start()
+        animate = ObjectAnimator.ofFloat(article_search_load,"rotation",0F,360F)
+        animate?.repeatCount = ValueAnimator.INFINITE
+        animate?.repeatMode = ValueAnimator.RESTART
+        animate?.start()
     }
 
     override fun hideLoadingView() {
-        article_search_load.animate().cancel()
+        animate?.cancel()
         article_search_load.visibility = View.INVISIBLE
     }
 
@@ -172,8 +173,12 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
             isExecute = true
         }
         if (dataBean == null) {
+            hideLoadingView()
+            showErrorView()
             return
         }
+        hideErrorView()
+
         currentPage = dataBean.curPage
         totalPage = dataBean.pageCount
         val articles = mutableListOf<DatasBean>()
@@ -208,5 +213,13 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
         val item = itemList[nowClick] as DatasBean
         item.collect = isCollected
         adapter?.notifyItemChanged(nowClick)
+    }
+
+    override fun showErrorView() {
+        article_search_error.visibility = View.VISIBLE
+    }
+
+    override fun hideErrorView() {
+        article_search_error.visibility = View.INVISIBLE
     }
 }
