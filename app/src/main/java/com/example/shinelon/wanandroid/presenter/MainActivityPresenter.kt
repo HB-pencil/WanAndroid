@@ -38,8 +38,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
     }
 
 
-    override
-    fun checkPermissions(permissions: Array<String>) {
+    override fun checkPermissions(permissions: Array<String>) {
         val res = isGrantedPermissions(permissions)
         if (!res) {
             ActivityCompat.requestPermissions(view!!.getActivityContext(), permissions, 0)

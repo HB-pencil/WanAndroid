@@ -98,7 +98,7 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
                 var loadErrView: TextView? = null
                 if (dy > 0 && layoutManager.findFirstVisibleItemPosition() > 0 &&
                         layoutManager.findLastVisibleItemPosition() == itemList.size - 1 &&
-                        currentPage + 1 <= totalPage) {
+                        currentPage + 1 < totalPage) {
                     Log.e(TAG,"$currentPage  $totalPage")
                     loadView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more)
                     loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)

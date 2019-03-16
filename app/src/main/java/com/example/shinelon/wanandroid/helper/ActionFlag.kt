@@ -5,5 +5,6 @@ enum class ActionFlag {
     LOGIN,
     REGISTER,
     SEARCH,
-    COLLECT
+    COLLECT,
+    OTHER
 }

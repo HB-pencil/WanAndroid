@@ -7,22 +7,21 @@ import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
 import com.example.shinelon.wanandroid.modle.Articles
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
-import com.example.shinelon.wanandroid.viewimp.ISearchArticleActivityView
+import com.example.shinelon.wanandroid.networkimp.StructPageRetrofit
+import com.example.shinelon.wanandroid.viewimp.ICommonItemActivityView
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>(){
-    var view: ISearchArticleActivityView? =null
-    val TAG = "SearchArticleActivityP"
-    override fun addView(view: ISearchArticleActivityView) {
+class CommonItemActivityPresenter: AbsPresenter<ICommonItemActivityView>(){
+    var view: ICommonItemActivityView? =null
+    val TAG = "CommonItemActivityPresenter"
+    override fun addView(view: ICommonItemActivityView) {
         this.view = view
     }
 
-    override fun jumpToTarget(flag: ActionFlag,intent: Intent) {
-
-    }
+    override fun jumpToTarget(flag: ActionFlag,intent: Intent) {}
 
     fun loadWeb(url: String,isCollected: Boolean,id: Long){
         val context = view!!.getActivityContext()
@@ -50,7 +49,7 @@ class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>()
                             view?.createContentView(t.data)
                         } else {
                             view?.createContentView(null)
-                            Log.e(TAG,t.errorMessage)
+                            Log.e(TAG,t.errorMsg)
                         }
                     }
 
@@ -61,6 +60,38 @@ class SearchArticleActivityPresenter: AbsPresenter<ISearchArticleActivityView>()
                     override fun onError(e: Throwable) {
                         view?.createContentView(null)
                         Log.e(TAG, "获取文章 $e")
+                    }
+                })
+    }
+    fun getStructItem(num: Int = 0,cid: Int){
+        RetrofitClient.INSTANCE.retrofit.create(StructPageRetrofit::class.java)
+                .getStructDetails(num,cid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<Articles>{
+                    override fun onSubscribe(d: Disposable) {
+                        Log.d(TAG,"onSubscribe")
+                    }
+
+                    override fun onNext(t: Articles) {
+                        Log.d(TAG,"onNext")
+                        if (t.errorCode >= 0) {
+                            view?.createContentView(t.data)
+                        } else {
+                            view?.createContentView(null)
+                            view?.showErrorView()
+                            Log.e(TAG,t.errorMsg)
+                        }
+                    }
+
+                    override fun onComplete() {
+                        Log.d(TAG,"onComplete")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.e(TAG,e.message)
+                        view?.createContentView(null)
+                        view?.showErrorView()
                     }
                 })
     }

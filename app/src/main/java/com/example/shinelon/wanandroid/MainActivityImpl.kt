@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
@@ -63,20 +62,14 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                     presenter?.jumpToTarget(ActionFlag.COLLECT,intent)
                 }
             }
-            R.id.panel_love_web -> {
-                if (!UserInfo.INSTANCE.isOnline){
-                    val intent = Intent(this,LoginActivityImpl::class.java)
-                    presenter?.jumpToTarget(ActionFlag.LOGIN,intent)
-                }else {
-
-                }
-            }
             R.id.panel_night_mode -> {
-                //TODO
+                toast(this,"夜间模式尚未完善！")
                 if(AppCompatDelegate.getDefaultNightMode()== AppCompatDelegate.MODE_NIGHT_YES)
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 else
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                // recreate()
+                val intent = Intent(this,this@MainActivityImpl::class.java)
                 recreate()
             }
             R.id.panel_setting -> {
@@ -100,8 +93,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         val permissions = arrayOf("android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE",
                 "android.permission.ACCESS_NETWORK_STATE")
 
+
         presenter?.checkPermissions(permissions)
         presenter?.checkNetworkState()
+
 
         setOnlineState(intent.getBooleanExtra("isOnline", false))
         val stateTv = navigation_view.getHeaderView(0).state_tv
@@ -155,7 +150,8 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         map[FragmentTag.NAVIGATE.tag] = fm.findFragmentByTag(FragmentTag.NAVIGATE.tag)?:getTargetFragment(FragmentTag.NAVIGATE.tag)
         val ft = fm.beginTransaction()
         map.forEach {
-            ft.add(R.id.fragment_container,it.value,it.key)
+            // 若Fragment已经存在，比如屏幕旋转实例被保存，则不能add
+            if (!it.value.isAdded) ft.add(R.id.fragment_container,it.value,it.key)
             if (it.value.tag == FragmentTag.HOME.tag) {
                 ft.show(it.value)
                 supportActionBar?.title = FragmentTag.HOME.tag
@@ -203,7 +199,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val intent = Intent(this@MainActivityImpl, SearchArticleActivityImpl::class.java)
+                val intent = Intent(this@MainActivityImpl, CommomItemActivityImpl::class.java)
                 intent.putExtra("search_key", query)
                 presenter?.jumpToTarget(ActionFlag.SEARCH, intent)
                 return true
@@ -327,7 +323,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
         hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
             override fun onClick(hotWord: String) {
-                val intent = Intent(this@MainActivityImpl,SearchArticleActivityImpl::class.java)
+                val intent = Intent(this@MainActivityImpl,CommomItemActivityImpl::class.java)
                 intent.putExtra("search_key",hotWord)
                 presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
             }

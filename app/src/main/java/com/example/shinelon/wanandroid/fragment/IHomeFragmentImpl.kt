@@ -54,6 +54,10 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
 
     private var nowClick: Int = -1
 
+    var animator: ObjectAnimator? = null
+    var loadView: ImageView? = null
+    var loadErrView: TextView? = null
+
     companion object {
         fun getInstance(bundle: Bundle?): IHomeFragmentImpl {
             val fragment = IHomeFragmentImpl()
@@ -70,15 +74,18 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     }
 
     override fun init() {
-        //此处两个为占位，分别是banner和load,load默认不可见
-        itemList.add(Any())
+        //此处占位，作为banner
         itemList.add(Any())
         recyclerView = rootView!!.findViewById(R.id.recycler_view_home)
         rcyvAdapter = object : BaseAdapter(itemList) {
             override fun bindData(holder: BaseViewHolder, position: Int) {
                 when (position) {
                     0 -> itemBannerV = holder.itemView //这里获得Banner这个item的View方便添加
-                    itemList.size - 1 -> Unit
+                    itemList.size - 1 -> {
+                        if(loadView == null) loadView = holder.getChildView(R.id.article_item_load_more)
+                        if(loadErrView == null) loadErrView = holder.getChildView(R.id.article_item_load_more_error)
+                        if(animator == null) animator = ObjectAnimator.ofFloat(loadView!!, "rotation", 0F, 360F)
+                    }
                     else -> {
                         val article = itemList[position] as DatasBean
                         holder.getChildView<TextView>(R.id.article_title_item).text = article.title
@@ -121,6 +128,8 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
         recyclerView?.layoutManager = LinearLayoutManager(activity)
         recyclerView?.adapter = rcyvAdapter
 
+
+
         val resId = R.anim.animation_list
         val animation = AnimationUtils.loadLayoutAnimation(activity,resId)
         recyclerView?.layoutAnimation = animation
@@ -137,23 +146,17 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 //滑到底部加载更多
-                var animator: ObjectAnimator? = null
-                var loadView: ImageView? = null
-                var loadErrView: TextView? = null
                 if (dy > 0 && layoutManager.findFirstVisibleItemPosition() > 0 &&
                         layoutManager.findLastVisibleItemPosition() == itemList.size - 1 &&
-                        currentPage + 1 <= totalPage) {
-                    loadView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more)
-                    loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)
+                        currentPage + 1 < totalPage) {
                     loadErrView?.visibility = View.INVISIBLE
 
                     if (!isLoading) {
-                        animator = ObjectAnimator.ofFloat(loadView!!, "rotation", 0F, 360F)
-                        animator.duration = 1000
-                        animator.repeatMode = ValueAnimator.RESTART
-                        animator.repeatCount = ValueAnimator.INFINITE
-                        loadView.visibility = View.VISIBLE
-                        animator.start()
+                        animator?.duration = 1000
+                        animator?.repeatMode = ValueAnimator.RESTART
+                        animator?.repeatCount = ValueAnimator.INFINITE
+                        loadView?.visibility = View.VISIBLE
+                        animator?.start()
                         Handler().postDelayed({
                             presenter?.getArticleList(currentPage++)
                         }, 500)
@@ -166,6 +169,9 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
             }
         })
     }
+
+
+
 
     override fun createBannerView(mutableList: MutableList<DataBeanBanner>) {
         if (mutableList.isEmpty()) return
@@ -199,6 +205,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
                 presenter?.onPageItemClick(listBannerUrl[realPosition], false, -1)
             }
         })
+
         Timer().schedule(object : TimerTask() {
             override fun run() {
                 activity?.runOnUiThread {
@@ -227,6 +234,7 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
         rcyvAdapter!!.notifyItemInserted(currentIndex)
         recyclerView!!.scheduleLayoutAnimation()
         currentIndex += data.datas.size
+        isLoading = false
         Log.i(TAG, "itemList size: ${itemList.size}")
     }
 

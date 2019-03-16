@@ -51,6 +51,7 @@ class CollectedActivityPresenter: AbsPresenter<ICollectedActivityView>() {
                             view?.createContentView(t.data)
                         } else {
                             view?.createContentView(null)
+                            Log.e(TAG,t.errorMsg)
                         }
                     }
 

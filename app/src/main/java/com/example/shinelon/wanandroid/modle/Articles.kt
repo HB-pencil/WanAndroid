@@ -3,7 +3,7 @@ package com.example.shinelon.wanandroid.modle
 /**
  * Created by Shinelon on 2018/4/28.
  */
-data class Articles(val data: DataBean, val errorCode: Int, val errorMessage: String)
+data class Articles(val data: DataBean, val errorCode: Int, val errorMsg: String)
 data class DataBean(val datas: MutableList<DatasBean>, val curPage: Int,val offset: Int, val over: Boolean, val pageCount: Int,
                      val size: Int, val total: Int)
 data class DatasBean(val apLink: String, val author: String, val chapterId: Int, val chapterName: String, var collect: Boolean,

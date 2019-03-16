@@ -45,7 +45,7 @@ class RegisterActivityPresenter: AbsPresenter<IRegisterAvtivityView>(){
 
    fun register(){
         RetrofitClient.INSTANCE.retrofit.create(LogInOutRetrofit::class.java)
-                .register(view?.getAccount()?:"",view?.getPassword()?:"",view?.getConfPassword()?:"")
+                .register( view?.getAccount()?:"",view?.getPassword()?:"",view?.getConfPassword()?:"")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(object: Consumer<RegisterRsp>{

@@ -30,7 +30,7 @@
         <activity android:name=".RegisterActivityImpl"
             android:label="用户注册"/>
         <activity android:name=".CommonWebViewActivity"/>
-        <activity android:name=".SearchArticleActivityImpl"/>
+        <activity android:name=".CommomItemActivityImpl"/>
         <activity android:name=".CollectedActivityImpl"/>
     </application>
 </manifest>

@@ -10,10 +10,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewPropertyAnimator
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
@@ -22,13 +22,13 @@ import com.example.shinelon.wanandroid.helper.BaseAdapter
 import com.example.shinelon.wanandroid.helper.BaseViewHolder
 import com.example.shinelon.wanandroid.modle.DataBean
 import com.example.shinelon.wanandroid.modle.DatasBean
-import com.example.shinelon.wanandroid.presenter.SearchArticleActivityPresenter
-import com.example.shinelon.wanandroid.viewimp.ISearchArticleActivityView
+import com.example.shinelon.wanandroid.presenter.CommonItemActivityPresenter
+import com.example.shinelon.wanandroid.viewimp.ICommonItemActivityView
 import kotlinx.android.synthetic.main.activity_article_search.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 
-class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView{
-    var presenter: SearchArticleActivityPresenter? = null
+class CommomItemActivityImpl : AppCompatActivity(),ICommonItemActivityView{
+    var presenter: CommonItemActivityPresenter? = null
     val TAG = "SearchArticleActivityP"
     val itemList = mutableListOf<Any>()
     private var currentPage = 0
@@ -37,7 +37,8 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
     var adapter: BaseAdapter? = null
     var isExecute = false
     var isLoading = false
-    var k: String = "android"
+    var k: String = ""
+    var cid: Int = -1
     private var nowClick: Int = -1
     var animate: ObjectAnimator? = null
 
@@ -47,7 +48,9 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
         setSupportActionBar(toolbar_base)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        k = intent.getStringExtra("search_key")?: "android"
+        k = intent.getStringExtra("search_key")?: ""
+        cid = intent.getIntExtra("struct_id",-1)
+
         if (presenter == null) setPresenter()
 
         recycler_view_search.layoutManager = LinearLayoutManager(this)
@@ -112,7 +115,7 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
                 var loadErrView: TextView? = null
                 if (dy > 0 && layoutManager.findFirstVisibleItemPosition() > 0 &&
                         layoutManager.findLastVisibleItemPosition() == itemList.size - 1 &&
-                        currentPage + 1 <= totalPage) {
+                        currentPage + 1 < totalPage) {
                     loadView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more)
                     loadErrView = recyclerView?.getChildAt(recyclerView.childCount - 1)?.findViewById(R.id.article_item_load_more_error)
                     loadErrView?.visibility = View.INVISIBLE
@@ -125,22 +128,31 @@ class SearchArticleActivityImpl : AppCompatActivity(),ISearchArticleActivityView
                         loadView.visibility = View.VISIBLE
                         animator.start()
                         Handler().postDelayed({
-                            presenter?.getSearchArticle(currentPage++,k)
+                            currentPage++
+                            sendQuestByJudge()
                         }, 500)
                         isLoading = true
                     }
                 } else {
+                    Log.d(TAG,"加载结束")
                     animator?.end()
                     loadView?.visibility = View.INVISIBLE
                 }
             }
         })
+        sendQuestByJudge()
+    }
 
-        presenter?.getSearchArticle(currentPage,k)
+    fun sendQuestByJudge() {
+        if (!TextUtils.isEmpty(k)) {
+            presenter?.getSearchArticle(currentPage,k)
+        } else if (cid >= 0) {
+            presenter?.getStructItem(currentPage,cid)
+        }
     }
 
     override fun setPresenter() {
-        presenter = SearchArticleActivityPresenter()
+        presenter = CommonItemActivityPresenter()
         presenter?.addView(this)
     }
 
