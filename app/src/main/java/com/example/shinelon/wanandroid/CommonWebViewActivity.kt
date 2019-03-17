@@ -55,8 +55,11 @@ class CommonWebViewActivity: AppCompatActivity(){
         }
 
         var url = intent.getStringExtra("web_url")
-        //9.0 默认不使用http，http可能是部分接口未更正
-        url = url.replace("http","https",true)
+        //玩安卓bug，http无法在P访问
+        var regex = Regex("^(http://www.wanandroid.com)")
+        url = url.replace(regex,"https://www.wanandroid.com")
+        regex = Regex("http://blog.csdn.net")
+        url = url.replace(regex,"https://blog.csdn.net")
         isCollected = intent.getBooleanExtra("collect_state",false)
         val id = intent.getLongExtra("id",-1)
         if (isCollected) article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collected_art,theme))
