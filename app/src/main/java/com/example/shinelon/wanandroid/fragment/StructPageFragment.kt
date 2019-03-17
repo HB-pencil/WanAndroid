@@ -31,6 +31,7 @@ class StructPageFragment: Fragment() {
         list  = arguments?.getSerializable("struct_item") as ArrayList<ChildData>
     }
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val  view = LayoutInflater.from(activity).inflate(R.layout.fragment_struct_item,container,false)
         val root = view.findViewById<LinearLayout>(R.id.fragment_struct_item_root)

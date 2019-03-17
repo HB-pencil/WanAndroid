@@ -48,12 +48,15 @@ class CommonWebViewActivity: AppCompatActivity(){
         webView!!.settings.cacheMode = WebSettings.LOAD_DEFAULT
         webView!!.settings.setAppCacheEnabled(true)
         webView!!.settings.setSupportZoom(false)
+        webView!!.settings.domStorageEnabled = true
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webView!!.settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
         }
 
-        val url = intent.getStringExtra("web_url")
+        var url = intent.getStringExtra("web_url")
+        //9.0 默认不使用http，http可能是部分接口未更正
+        url = url.replace("http","https",true)
         isCollected = intent.getBooleanExtra("collect_state",false)
         val id = intent.getLongExtra("id",-1)
         if (isCollected) article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collected_art,theme))
