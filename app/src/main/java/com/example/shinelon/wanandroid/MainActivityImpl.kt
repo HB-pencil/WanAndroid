@@ -98,7 +98,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         presenter?.checkNetworkState()
 
 
-        setOnlineState(intent.getBooleanExtra("isOnline", false))
+        UserInfo.INSTANCE.isOnline = intent.getBooleanExtra("isOnline", false)
         val stateTv = navigation_view.getHeaderView(0).state_tv
         stateTv.setOnClickListener {
             if (!getOnlineState()) {
@@ -223,10 +223,6 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
     override fun getOnlineState() = UserInfo.INSTANCE.isOnline
 
-    override fun setOnlineState(isOnline: Boolean) {
-        UserInfo.INSTANCE.isOnline = isOnline
-    }
-
     override fun getActivityContext() = this
 
     override fun updateHeaderView(isOnline: Boolean, name: String?) {
@@ -251,6 +247,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         val reCreate = intent?.getBooleanExtra("recreate",false)
         Log.d(TAG, "name:$name;isOnline:$isOnline")
         if (intent != null) updateHeaderView(isOnline!!, name)
+        /**
         if (reCreate != null && reCreate){
             val ft = supportFragmentManager.beginTransaction()
             //寻找原先存在的并移除，重新创建
@@ -262,7 +259,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             ft.add(home,FragmentTag.HOME.tag)
             ft.show(home)
             ft.commit()
-        }
+        }*/
     }
 
     override fun onBackPressed() {

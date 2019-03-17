@@ -75,16 +75,16 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
                             //FIXME 自动登录成功验证，不知道具体什么是登录成功？
                             if (response.isSuccessful) {
                                 view?.updateHeaderView(true, userName)
-                                view?.setOnlineState(true)
+                                UserInfo.INSTANCE.isOnline = true
                             } else {
                                 view?.updateHeaderView(false, "")
-                                view?.setOnlineState(false)
+                                UserInfo.INSTANCE.isOnline = false
                             }
                         }
 
                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                             view?.updateHeaderView(false, "")
-                            view?.setOnlineState(false)
+                            UserInfo.INSTANCE.isOnline = false
                         }
                     })
         } else if (isAuto) {
@@ -94,7 +94,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
             spUtil.putLong("expireTime", Long.MIN_VALUE)
             spUtil.putBoolean("isAuto", false)
             view?.updateHeaderView(false, "")
-            view?.setOnlineState(false)
+            UserInfo.INSTANCE.isOnline = false
         }
         Log.w(TAG, "保存的cookie:$cookie\n保存的时间:$expireTime")
     }
@@ -118,6 +118,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
         spUtil.putString("cookie")
         spUtil.putLong("expireTime")
         spUtil.putBoolean("isAuto")
+        UserInfo.INSTANCE.isOnline = false
         spUtil.commit()
         view?.updateHeaderView(false, "")
     }

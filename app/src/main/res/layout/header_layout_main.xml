@@ -20,12 +20,13 @@
         android:textSize="20sp"
         android:textColor="@color/black"
         android:text="@string/unknown_user"/>
-    <TextView
+    <Button
         android:id="@+id/state_tv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:textColor="@color/black"
+        android:background="@drawable/ripple_general"
         android:text="@string/user_login"/>
 </RelativeLayout>

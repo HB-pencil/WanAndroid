@@ -8,5 +8,4 @@ interface IMainActivityView: IView {
     fun hideHotWords()
     fun updateHeaderView(isOnline: Boolean,name: String?)
     fun getOnlineState(): Boolean
-    fun setOnlineState(isOnline: Boolean)
 }
