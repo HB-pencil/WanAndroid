@@ -9,6 +9,7 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +17,9 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.example.shinelon.wanandroid.helper.BaseAdapter
 import com.example.shinelon.wanandroid.helper.BaseViewHolder
 import com.example.shinelon.wanandroid.modle.DataBean
@@ -36,6 +40,11 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
     var isExecute = false
     var isLoading = false
     private var nowClick: Int = -1
+    val options = RequestOptions()
+            .error(R.drawable.error_image)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            //.placeholder(R.drawable.loading)
+            .fitCenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +77,12 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
                         holder.getChildView<TextView>(R.id.time_occupy).text = "收藏时间"
                         holder.getChildView<Button>(R.id.article_tags_item).visibility = View.GONE
                         holder.getChildView<ImageView>(R.id.article_status).visibility = View.GONE
+                        val img = holder.getChildView<ImageView>(R.id.imgPic)
+                        if (TextUtils.isEmpty(article.envelopePic)) return
+                        Glide.with(getActivityContext())
+                                .load(article.envelopePic)
+                                .apply(options)
+                                .into(img)
                     }
                 }
             }

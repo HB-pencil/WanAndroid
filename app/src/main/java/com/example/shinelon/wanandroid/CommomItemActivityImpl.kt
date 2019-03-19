@@ -18,6 +18,9 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.example.shinelon.wanandroid.helper.BaseAdapter
 import com.example.shinelon.wanandroid.helper.BaseViewHolder
 import com.example.shinelon.wanandroid.modle.DataBean
@@ -42,6 +45,12 @@ class CommomItemActivityImpl : AppCompatActivity(),ICommonItemActivityView{
     private var nowClick: Int = -1
     var animate: ObjectAnimator? = null
 
+    val options = RequestOptions()
+            .error(R.drawable.error_image)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            //.placeholder(R.drawable.loading)
+            .fitCenter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_article_search)
@@ -49,7 +58,7 @@ class CommomItemActivityImpl : AppCompatActivity(),ICommonItemActivityView{
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         k = intent.getStringExtra("search_key")?: ""
-        cid = intent.getIntExtra("struct_id",-1)
+        cid = intent.getIntExtra("cid",-1)
 
         if (presenter == null) setPresenter()
 
@@ -85,6 +94,12 @@ class CommomItemActivityImpl : AppCompatActivity(),ICommonItemActivityView{
                         holder.getChildView<TextView>(R.id.author_item).text = article.author
                         holder.getChildView<TextView>(R.id.article_category).text = "${article.superChapterName} ${article.chapterName}"
                         holder.getChildView<TextView>(R.id.article_time).text = article.niceDate
+                        val img = holder.getChildView<ImageView>(R.id.imgPic)
+                        if (TextUtils.isEmpty(article.envelopePic)) return
+                        Glide.with(getActivityContext())
+                                .load(article.envelopePic)
+                                .apply(options)
+                                .into(img)
                     }
                 }
             }
@@ -147,7 +162,7 @@ class CommomItemActivityImpl : AppCompatActivity(),ICommonItemActivityView{
         if (!TextUtils.isEmpty(k)) {
             presenter?.getSearchArticle(currentPage,k)
         } else if (cid >= 0) {
-            presenter?.getStructItem(currentPage,cid)
+            presenter?.getStructProjectItem(currentPage,cid)
         }
     }
 

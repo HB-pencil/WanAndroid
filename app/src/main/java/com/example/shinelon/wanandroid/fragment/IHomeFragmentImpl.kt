@@ -9,6 +9,7 @@ import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -58,6 +59,12 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     var loadView: ImageView? = null
     var loadErrView: TextView? = null
 
+    val options = RequestOptions()
+            .error(R.drawable.error_image)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            //.placeholder(R.drawable.loading)
+            .fitCenter()
+
     companion object {
         fun getInstance(bundle: Bundle?): IHomeFragmentImpl {
             val fragment = IHomeFragmentImpl()
@@ -104,6 +111,12 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
                         holder.getChildView<TextView>(R.id.author_item).text = article.author
                         holder.getChildView<TextView>(R.id.article_category).text = "${article.superChapterName} ${article.chapterName}"
                         holder.getChildView<TextView>(R.id.article_time).text = article.niceDate
+                        val img =  holder.getChildView<ImageView>(R.id.imgPic)
+                        if (TextUtils.isEmpty(article.envelopePic)) return
+                        Glide.with(activity!!)
+                                .load(article.envelopePic)
+                                .apply(options)
+                                .into(img)
                     }
                 }
             }
@@ -175,11 +188,6 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
 
     override fun createBannerView(mutableList: MutableList<DataBeanBanner>) {
         if (mutableList.isEmpty()) return
-        val options = RequestOptions()
-                .error(R.drawable.error_image)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                //.placeholder(R.drawable.loading)
-                .fitCenter()
         mutableList.forEach {
             val view = LayoutInflater.from(activity).inflate(R.layout.view_pager_item, null, false)
             view.banner_image_title.text = it.title

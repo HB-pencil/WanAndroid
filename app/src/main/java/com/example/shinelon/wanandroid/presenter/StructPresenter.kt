@@ -43,6 +43,7 @@ class StructPresenter: AbsPresenter<IStructFragmentView>() {
                         Log.d(TAG,"onNext")
                         if (t.errorCode >= 0) {
                             view?.initPages(t.data)
+                            view?.hideErrorView()
                         } else {
                             view?.showErrorView()
                             Log.e(TAG,t.errorMsg)

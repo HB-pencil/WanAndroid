@@ -68,7 +68,7 @@ class IStructFragmentImpl: BaseFragment(),IStructFragmentView,StructPageFragment
     override fun onClick(id: Int) {
         Log.d(TAG,"分级 $id")
         val intent = Intent(activity,CommomItemActivityImpl::class.java)
-        intent.putExtra("struct_id",id)
+        intent.putExtra("cid",id)
         presenter?.jumpToTarget(ActionFlag.OTHER,intent)
     }
 }

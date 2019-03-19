@@ -63,7 +63,7 @@ class CommonItemActivityPresenter: AbsPresenter<ICommonItemActivityView>(){
                     }
                 })
     }
-    fun getStructItem(num: Int = 0,cid: Int){
+    fun getStructProjectItem(num: Int = 0,cid: Int){
         RetrofitClient.INSTANCE.retrofit.create(StructPageRetrofit::class.java)
                 .getStructDetails(num,cid)
                 .subscribeOn(Schedulers.io())
