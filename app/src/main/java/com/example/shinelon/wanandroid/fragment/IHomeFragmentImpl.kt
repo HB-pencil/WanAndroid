@@ -112,7 +112,6 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
                         holder.getChildView<TextView>(R.id.article_category).text = "${article.superChapterName} ${article.chapterName}"
                         holder.getChildView<TextView>(R.id.article_time).text = article.niceDate
                         val img =  holder.getChildView<ImageView>(R.id.imgPic)
-                        if (TextUtils.isEmpty(article.envelopePic)) return
                         Glide.with(activity!!)
                                 .load(article.envelopePic)
                                 .apply(options)

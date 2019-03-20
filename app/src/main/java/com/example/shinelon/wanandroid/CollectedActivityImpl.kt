@@ -78,7 +78,6 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
                         holder.getChildView<Button>(R.id.article_tags_item).visibility = View.GONE
                         holder.getChildView<ImageView>(R.id.article_status).visibility = View.GONE
                         val img = holder.getChildView<ImageView>(R.id.imgPic)
-                        if (TextUtils.isEmpty(article.envelopePic)) return
                         Glide.with(getActivityContext())
                                 .load(article.envelopePic)
                                 .apply(options)
