@@ -63,13 +63,13 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
                 }
             }
             R.id.panel_night_mode -> {
-                if(AppCompatDelegate.getDefaultNightMode()== AppCompatDelegate.MODE_NIGHT_YES)
+               /** if(AppCompatDelegate.getDefaultNightMode()== AppCompatDelegate.MODE_NIGHT_YES)
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 else
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                // recreate()
-                val intent = Intent(this,this@MainActivityImpl::class.java)
                 //recreate()
+                val intent = Intent(this,this@MainActivityImpl::class.java)
+                recreate() */
                 toast(this,"暂未完善！")
             }
             R.id.panel_setting -> {
