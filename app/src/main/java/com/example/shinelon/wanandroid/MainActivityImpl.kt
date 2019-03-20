@@ -32,6 +32,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     private val TAG = "MainActivityImpl"
     private var presenter: MainActivityPresenter? = null
     private var mWindow: HotSearchPopupWin? = null
+    private var isWinShow = false
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -266,6 +267,8 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(Gravity.START)) {
             drawer_layout.closeDrawer(Gravity.START)
+        } else if (isWinShow) {
+            hideHotWords()
         } else {
             super.onBackPressed()
         }
@@ -304,6 +307,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     }
 
     override fun showHotWords(list: MutableList<String>) {
+        isWinShow = true
         val hotWindow = HotSearchPopupWin(this)
         if (mWindow == null) mWindow = hotWindow
         hotWindow.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -329,6 +333,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     }
 
     override fun hideHotWords() {
+        isWinShow = false
         mWindow?.dismiss()
         mWindow = null
     }
