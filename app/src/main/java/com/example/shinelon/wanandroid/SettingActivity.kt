@@ -20,5 +20,8 @@ class SettingActivity: AppCompatActivity() {
                 .add(R.id.activity_container,fragment)
                 .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar_base.setNavigationOnClickListener {
+            finish()
+        }
     }
 }
