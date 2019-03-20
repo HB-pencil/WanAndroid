@@ -29,4 +29,16 @@
     <string name="time">时间：</string>
 
     <string name="load_error">加载错误，请稍后再试( ╯□╰ )！</string>
+
+    <string name="about_setting">关于</string>
+    <string name="about_this_app">关于Androider</string>
+    <string name="about_user_suggest_setting">意见反馈</string>
+    <string name="about_user_suggest_summary">点击提出意见</string>
+    <string name="more_setting">更多</string>
+    <string name="check_update_setting">检查更新</string>
+    <string name="clear_setting">清除缓存</string>
+    <string name="copyright">Developed By Hopkin © 2019</string>
+    <string name="open_source">开源支持</string>
+    <string name="about_details">Androider是个人基于“玩安卓”网站开放Api开发的开源学习软件，更多详细信息请点击
+    “开源支持”了解</string>
 </resources>

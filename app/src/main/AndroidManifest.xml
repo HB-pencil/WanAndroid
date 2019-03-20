@@ -32,5 +32,6 @@
         <activity android:name=".CommonWebViewActivity"/>
         <activity android:name=".CommomItemActivityImpl"/>
         <activity android:name=".CollectedActivityImpl"/>
+        <activity android:name=".SettingActivity"/>
     </application>
 </manifest>
