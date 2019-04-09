@@ -2,8 +2,9 @@ package com.example.shinelon.wanandroid.fragment
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.app.DialogFragment
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
+import java.io.Serializable
 
 class CommonDialogFragment: DialogFragment(){
 
@@ -13,6 +14,7 @@ class CommonDialogFragment: DialogFragment(){
             val bundle = Bundle()
             bundle.putString("title",title)
             bundle.putString("message",message)
+            bundle.putSerializable("listener",listener)
             dialogFragment.arguments = bundle
             return dialogFragment
         }
@@ -20,20 +22,21 @@ class CommonDialogFragment: DialogFragment(){
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
-        val title = arguments.getString("title")
-        val message = arguments.getString("message")
+        val title = arguments?.getString("title")
+        val message = arguments?.getString("message")
+        val listener = arguments?.getSerializable("listener") as CommonDialogListener
         val builder = AlertDialog.Builder(activity)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK"){ _,_ ->
-                    val listener = activity as CommonDialogListener
                     listener.onPositiveClick()
                 }
                 .setNegativeButton("CANCEL"){_,_ ->
-                    val listener = activity as CommonDialogListener
                     listener.onNegativeClick()
                 }
-        return builder.create()
+        val dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
     }
 
 }
@@ -41,7 +44,8 @@ class CommonDialogFragment: DialogFragment(){
 /**
  * 托管该Fragment的Activity必须实现该接口
  */
-interface CommonDialogListener{
+interface CommonDialogListener: Serializable{
+    val uuid: Long
     fun onPositiveClick()
     fun onNegativeClick()
 }

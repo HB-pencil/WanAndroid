@@ -51,6 +51,9 @@ class CollectedActivityImpl: AppCompatActivity(),ICollectedActivityView {
         setContentView(R.layout.activity_article_search)
         setSupportActionBar(toolbar_base)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar_base.setNavigationOnClickListener {
+            finish()
+        }
 
         if (presenter == null) setPresenter()
 

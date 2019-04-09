@@ -1,19 +1,23 @@
 package com.example.shinelon.wanandroid
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.app.AppCompatDelegate
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
@@ -21,18 +25,19 @@ import android.widget.FrameLayout
 import com.example.shinelon.wanandroid.fragment.*
 import com.example.shinelon.wanandroid.helper.*
 import com.example.shinelon.wanandroid.presenter.MainActivityPresenter
+import com.example.shinelon.wanandroid.utils.toast
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 import kotlinx.android.synthetic.main.header_layout_main.view.*
 
-class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener,
-        CommonDialogListener {
+class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener{
     private val TAG = "MainActivityImpl"
     private var presenter: MainActivityPresenter? = null
     private var mWindow: HotSearchPopupWin? = null
     private var isWinShow = false
+    private var networkStateReceiver: NetWorkStateReceiver? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -95,11 +100,6 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         val permissions = arrayOf("android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE",
                 "android.permission.ACCESS_NETWORK_STATE")
 
-
-        presenter?.checkPermissions(permissions)
-        presenter?.checkNetworkState()
-
-
         UserInfo.INSTANCE.isOnline = intent.getBooleanExtra("isOnline", false)
         val stateTv = navigation_view.getHeaderView(0).state_tv
         stateTv.setOnClickListener {
@@ -116,7 +116,13 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         navigation_bottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         NavigationViewhelper.disableShiftMode(navigation_bottom)
 
-        initFragments() //初始化
+        presenter?.checkPermissions(permissions)
+
+        networkStateReceiver = networkStateReceiver?: NetWorkStateReceiver()
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkStateReceiver,intentFilter)
+
     }
 
     override fun onResume() {
@@ -274,25 +280,25 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         }
     }
 
-    override fun onPositiveClick() {
-        val i = Intent()
-        i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.fromParts("package", this.packageName, null)
-        i.data = uri
-        startActivity(i)
-    }
-
-    override fun onNegativeClick() {
-        finish()
-    }
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 0 && Build.VERSION.SDK_INT >= 23) {
             grantResults.forEach {
                 if (it == PackageManager.PERMISSION_DENIED) {
                     if (!shouldShowRequestPermissionRationale(permissions[grantResults.indexOf(it)])) {
-                        showWarnDialog(this@MainActivityImpl, "为了软件正常运行，请允许申请的权限！", "警告")
+                        showWarnDialog(object: CommonDialogListener{
+                            override val uuid = System.currentTimeMillis()
+                            override fun onPositiveClick() {
+                                val i = Intent()
+                                i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                val uri = Uri.fromParts("package", packageName, null)
+                                i.data = uri
+                                startActivity(i)
+                            }
+                            override fun onNegativeClick() {
+                                finish()
+                            }
+                        }, "为了软件正常运行，请允许申请的权限！", "警告","权限")
                     } else {
                         finish()
                     }
@@ -301,9 +307,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         }
     }
 
-    override fun showWarnDialog(listener: CommonDialogListener, message: String, title: String) {
+    override fun showWarnDialog(listener: CommonDialogListener, message: String, title: String,tag: String): DialogFragment {
         val dialog = CommonDialogFragment.newInstance(title, message, listener)
-        dialog.show(fragmentManager, "tag")
+        dialog.show(supportFragmentManager, tag)
+        return dialog
     }
 
     override fun showHotWords(list: MutableList<String>) {
@@ -336,6 +343,21 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         isWinShow = false
         mWindow?.dismiss()
         mWindow = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(networkStateReceiver)
+    }
+
+    inner class NetWorkStateReceiver: BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (!presenter!!.checkNetworkState()){
+                return
+            }
+            initFragments()
+            Log.w("NetWorkState","网络状态改变")
+        }
     }
 }
 

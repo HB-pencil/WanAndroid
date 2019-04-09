@@ -1,22 +1,20 @@
 package com.example.shinelon.wanandroid
 
 import android.app.Activity
-import android.app.Fragment
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
-import android.opengl.Visibility
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.FrameLayout
 import com.example.shinelon.wanandroid.helper.RetrofitClient
-import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.utils.toast
 import com.example.shinelon.wanandroid.modle.RequestResult
 import com.example.shinelon.wanandroid.networkimp.CollectStateRetrofit
 import io.reactivex.Observer
@@ -30,6 +28,7 @@ class CommonWebViewActivity: AppCompatActivity(){
     val TAG = "CommonWebViewActivity"
     var webView: WebView? = null
     var isCollected = false
+    var url = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +36,9 @@ class CommonWebViewActivity: AppCompatActivity(){
 
         setSupportActionBar(toolbar_base)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        toolbar_base.setNavigationOnClickListener {
+            finish()
+        }
 
         webView = WebView(this)
         web_container.addView(webView)
@@ -50,11 +52,7 @@ class CommonWebViewActivity: AppCompatActivity(){
         webView!!.settings.setSupportZoom(false)
         webView!!.settings.domStorageEnabled = true
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            webView!!.settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-        }
-
-        var url = intent.getStringExtra("web_url")
+        url = intent.getStringExtra("web_url")
         //玩安卓bug，http无法在P访问
         var regex = Regex("^(http://www.wanandroid.com)")
         url = url.replace(regex,"https://www.wanandroid.com")
@@ -144,11 +142,20 @@ class CommonWebViewActivity: AppCompatActivity(){
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
-            return true
+        if (item?.itemId == R.id.share) {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT,"${resources.getString(R.string.article_share_tips)}$url")
+            Intent.createChooser(intent,"分享")
+            startActivity(intent)
+            Log.i(TAG,url)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_web_article,menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     /**

@@ -2,7 +2,7 @@ package com.example.shinelon.wanandroid
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.utils.toast
 import com.example.shinelon.wanandroid.presenter.RegisterActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.IRegisterAvtivityView
 import kotlinx.android.synthetic.main.activity_register.*

@@ -2,7 +2,6 @@ package com.example.shinelon.wanandroid.fragment
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -11,7 +10,7 @@ import android.preference.PreferenceFragment
 import android.support.design.widget.Snackbar
 import com.bumptech.glide.disklrucache.DiskLruCache
 import com.example.shinelon.wanandroid.R
-import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.utils.toast
 import java.io.File
 import java.security.MessageDigest
 

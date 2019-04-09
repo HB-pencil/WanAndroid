@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.*
 import android.widget.LinearLayout.LayoutParams
 import com.example.shinelon.wanandroid.R
-import com.example.shinelon.wanandroid.helper.toast
 import kotlinx.android.synthetic.main.hot_search_window.view.*
 
 class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClickListener {

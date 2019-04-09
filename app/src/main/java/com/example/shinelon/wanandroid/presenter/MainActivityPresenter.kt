@@ -3,18 +3,15 @@ package com.example.shinelon.wanandroid.presenter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import com.example.shinelon.wanandroid.CommonWebViewActivity
 import com.example.shinelon.wanandroid.LoginActivityImpl
 import com.example.shinelon.wanandroid.UserInfo
-import com.example.shinelon.wanandroid.fragment.CommonDialogFragment
 import com.example.shinelon.wanandroid.fragment.CommonDialogListener
 import com.example.shinelon.wanandroid.helper.ActionFlag
 import com.example.shinelon.wanandroid.helper.RetrofitClient
-import com.example.shinelon.wanandroid.helper.toast
-import com.example.shinelon.wanandroid.modle.Articles
-import com.example.shinelon.wanandroid.modle.Banner
+import com.example.shinelon.wanandroid.utils.toast
 import com.example.shinelon.wanandroid.modle.HotWord
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
@@ -30,9 +27,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogListener {
+class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
     var view: IMainActivityView? = null
     val TAG = "MainActivityPresenter"
+    var dialog: DialogFragment? = null
     override fun addView(v: IMainActivityView) {
         view = v
     }
@@ -157,19 +155,20 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>(),CommonDialogList
                 })
     }
 
-    fun checkNetworkState(){
+    fun checkNetworkState(): Boolean{
         val res = NetWorkUtils.isNetWorkAvailable(view!!.getActivityContext())
         if (!res){
-            view?.showWarnDialog(this,"检测不到可用网络，请确保网络通畅！","警告")
+            dialog = view?.showWarnDialog(object: CommonDialogListener{
+                override val uuid = System.currentTimeMillis()
+                override fun onPositiveClick() {
+                    dialog?.dismiss()
+                }
+                override fun onNegativeClick() {
+                    view?.getActivityContext()?.finish()
+                }
+            },"检测不到可用网络，请确保网络通畅！","警告","网络")
+            return false
         }
-    }
-
-
-    override fun onPositiveClick() {
-        return
-    }
-
-    override fun onNegativeClick() {
-        view?.getActivityContext()?.finish()
+        return true
     }
 }

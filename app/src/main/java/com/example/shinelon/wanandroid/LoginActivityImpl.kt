@@ -1,14 +1,10 @@
 package com.example.shinelon.wanandroid
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.widget.CompoundButton
 import com.example.shinelon.wanandroid.helper.ActionFlag
-import com.example.shinelon.wanandroid.helper.toast
+import com.example.shinelon.wanandroid.utils.toast
 import com.example.shinelon.wanandroid.presenter.LoginActivityPresenter
 import com.example.shinelon.wanandroid.viewimp.ILoginActivityView
 import kotlinx.android.synthetic.main.activity_login.*

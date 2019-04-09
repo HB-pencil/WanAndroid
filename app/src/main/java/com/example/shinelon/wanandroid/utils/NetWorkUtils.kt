@@ -1,6 +1,5 @@
 package com.example.shinelon.wanandroid.utils
 
-import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.net.ConnectivityManager
 

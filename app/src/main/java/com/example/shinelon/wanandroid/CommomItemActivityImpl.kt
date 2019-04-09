@@ -56,6 +56,9 @@ class CommomItemActivityImpl : AppCompatActivity(),ICommonItemActivityView{
         setContentView(R.layout.activity_article_search)
         setSupportActionBar(toolbar_base)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar_base.setNavigationOnClickListener {
+            finish()
+        }
 
         k = intent.getStringExtra("search_key")?: ""
         cid = intent.getIntExtra("cid",-1)
