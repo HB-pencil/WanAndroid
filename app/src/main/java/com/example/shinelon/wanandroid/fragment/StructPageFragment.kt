@@ -44,7 +44,7 @@ class StructPageFragment: Fragment() {
             text.layoutParams = params
             text.gravity = Gravity.CENTER
             text.setPadding(10,10,10,10)
-            text.background = root.resources.getDrawable(R.drawable.ripple_win)
+            text.background = root.resources.getDrawable(R.drawable.ripple_struct)
             root.addView(text)
             val id = it.id
             text.setOnClickListener {

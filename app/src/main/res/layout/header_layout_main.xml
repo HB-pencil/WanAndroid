@@ -27,6 +27,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:textColor="@color/black"
+        style="?android:attr/borderlessButtonStyle"
         android:background="@drawable/ripple_general"
         android:text="@string/user_login"/>
 </RelativeLayout>

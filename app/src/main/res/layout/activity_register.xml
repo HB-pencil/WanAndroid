@@ -7,7 +7,8 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/general">
         <android.support.design.widget.TextInputLayout
             android:layout_width="250dp"
             android:layout_height="wrap_content">
@@ -40,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/user_register"
+            style="?android:attr/borderlessButtonStyle"
             android:background="@drawable/ripple_general"
             android:layout_marginTop="5dp"/>
     </LinearLayout>

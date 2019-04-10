@@ -222,6 +222,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                //TODO kmp匹配
                 return true
             }
         })
