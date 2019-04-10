@@ -25,7 +25,8 @@
     <string name="user_register">确认注册</string>
 
     <string name="hot_words">搜索热词</string>
-    <string name="error_msg">没有找到搜索热词呢( ╯□╰ )！</string>
+    <string name="error_msg_search">没有发现相关内容呢( ╯□╰ )！</string>
+    <string name="guess_search">猜你想搜</string>
 
     <string name="author">作者：</string>
     <string name="category">分类：</string>

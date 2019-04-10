@@ -18,6 +18,7 @@ import com.example.shinelon.wanandroid.R
 import com.example.shinelon.wanandroid.customview.FlowLayout
 import com.example.shinelon.wanandroid.modle.ProjectCategory
 import com.example.shinelon.wanandroid.presenter.ProjectPresenter
+import com.example.shinelon.wanandroid.utils.dpToPx
 import com.example.shinelon.wanandroid.viewimp.IProjectFragmentView
 
 class IProjectFragmentImpl:BaseFragment(),IProjectFragmentView{
@@ -49,12 +50,12 @@ class IProjectFragmentImpl:BaseFragment(),IProjectFragmentView{
     override fun initPages(data: MutableList<ProjectCategory>) {
         data.forEach {
             val p = FlowLayout.FlowLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            p.setMargins(20,10,20,10)
+            p.setMargins(30,10,30,10)
             val text = Button(context)
             text.text = it.name
             text.layoutParams = p
             text.gravity = Gravity.CENTER
-            text.textSize = dpToPx(18F)
+            text.textSize = 18F
             text.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             text.setTextColor(Color.BLACK)
             text.setPadding(20,10,20,10)
@@ -75,6 +76,4 @@ class IProjectFragmentImpl:BaseFragment(),IProjectFragmentView{
     override fun hideErrorView() {
         rootView!!.findViewById<TextView>(R.id.load_error).visibility = View.INVISIBLE
     }
-
-    fun dpToPx(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, value, activity!!.resources.displayMetrics)
 }

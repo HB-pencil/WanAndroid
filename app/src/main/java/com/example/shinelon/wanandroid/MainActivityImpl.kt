@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import com.example.shinelon.wanandroid.fragment.*
 import com.example.shinelon.wanandroid.helper.*
@@ -31,6 +32,9 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_toolbar.*
 import kotlinx.android.synthetic.main.header_layout_main.view.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 
 class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener{
     private val TAG = "MainActivityImpl"
@@ -202,8 +206,12 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         val searchView = menuItem?.actionView as SearchView
         searchView.isSubmitButtonEnabled = true
         searchView.queryHint = "搜索"
+        searchView.queryHint = "输入搜索关键字"
         searchView.setOnSearchClickListener {
             presenter?.getHotWords()
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(searchView.windowToken,0)
+            navigation_view.requestFocus() // 为了收起软键盘
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -320,23 +328,39 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         hotWindow.width = WindowManager.LayoutParams.MATCH_PARENT
         hotWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
         hotWindow.isErrorViewShow(list.isEmpty())
-        for (i in 0..(list.size - 1) step 2) {
-            hotWindow.addHotWord(list[i], if (i + 1 == list.size) "" else list[i + 1])
-        }
-        hotWindow.showWindow(toolbar_base)
-        val contentView = window.decorView.findViewById<FrameLayout>(android.R.id.content)
-        contentView.setBackgroundColor(resources.getColor(R.color.mask))
-        hotWindow.setOnDismissListener {
-            contentView.setBackgroundColor(Color.WHITE)
-        }
 
-        hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
-            override fun onClick(hotWord: String) {
-                val intent = Intent(this@MainActivityImpl,CommomItemActivityImpl::class.java)
-                intent.putExtra("search_key",hotWord)
-                presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
+        launch(UI) {
+            val result = async {
+                //TODO topN算法
+                listOf("test1","test2","test3","test4","test5","test6","test7","test8","test9","test10")
+            }.await()
+
+            hotWindow.addTitle("搜索热词")
+            list.forEach {
+                hotWindow.addWord(it)
             }
-        })
+            hotWindow.addTitle("猜你想搜")
+            result.forEach {
+                hotWindow.addWord(it)
+            }
+
+            hotWindow.showWindow(toolbar_base)
+
+            //蒙层遮罩
+            val contentView = window.decorView.findViewById<FrameLayout>(android.R.id.content)
+            contentView.setBackgroundColor(resources.getColor(R.color.mask))
+            hotWindow.setOnDismissListener {
+                contentView.setBackgroundColor(Color.WHITE)
+            }
+
+            hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
+                override fun onClick(hotWord: String) {
+                    val intent = Intent(this@MainActivityImpl,CommomItemActivityImpl::class.java)
+                    intent.putExtra("search_key",hotWord)
+                    presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
+                }
+            })
+        }
     }
 
     override fun hideHotWords() {

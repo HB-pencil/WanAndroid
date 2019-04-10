@@ -15,6 +15,8 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
 import com.example.shinelon.wanandroid.customview.FlowLayout
+import com.example.shinelon.wanandroid.utils.dpToPx
+import com.example.shinelon.wanandroid.utils.getRandomColor
 
 
 class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
@@ -45,10 +47,10 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
         response.forEach {
             val title = TextView(context)
             val params = FlowLayout.FlowLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
-            params.topMargin =  dpToPx(20F).toInt()
-            params.bottomMargin = dpToPx(10F).toInt()
+            params.topMargin =  dpToPx(20F,getActivityContext()).toInt()
+            params.bottomMargin = dpToPx(10F,getActivityContext()).toInt()
             title.setPadding(25,25,25,25)
-            title.textSize = dpToPx(25F)
+            title.textSize = 25F
             title.setTextColor(Color.BLACK)
             title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             title.layoutParams = params
@@ -62,7 +64,7 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
                 text.text = it.title
                 text.layoutParams = p
                 text.gravity = Gravity.CENTER
-                text.textSize = dpToPx(15F)
+                text.textSize = 15F
                 text.setTextColor(getRandomColor())
                 text.setPadding(15,10,15,10)
                 text.setBackgroundColor(Color.TRANSPARENT)
@@ -77,19 +79,5 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
         val view = rootView!!.findViewById<TextView>(R.id.navigate_error)
         view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
-
-    fun getRandomColor(): Int{
-        var res = (Math.random()*10/2).toInt()
-        when (res) {
-            0 -> res = Color.BLUE
-            1 -> res = Color.RED
-            2 -> res = Color.CYAN
-            3 -> res = Color.GREEN
-            else -> res = Color.MAGENTA
-        }
-        return res
-    }
-
-    fun dpToPx(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, value, activity!!.resources.displayMetrics)
 
 }
