@@ -66,8 +66,12 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
     }
 
     fun isErrorViewShow(isShow: Boolean){
-        val root = contentView as FrameLayout
-        root.findViewById<TextView>(R.id.error_view).visibility = if (isShow) View.VISIBLE  else View.GONE
+        val errorView = LayoutInflater.from(context).inflate(R.layout.search_error_view,container,false)
+        if (isShow) {
+            container!!.addView(errorView)
+        } else {
+            container!!.removeView(errorView)
+        }
     }
 
     fun showWindow(view: View){

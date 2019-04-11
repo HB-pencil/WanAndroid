@@ -47,17 +47,16 @@ class CommonWebViewActivity: AppCompatActivity(){
         layoutParams.height = FrameLayout.LayoutParams.MATCH_PARENT
 
         webView!!.settings.javaScriptEnabled = true
+        webView!!.settings.javaScriptCanOpenWindowsAutomatically = true
         webView!!.settings.cacheMode = WebSettings.LOAD_DEFAULT
         webView!!.settings.setAppCacheEnabled(true)
-        webView!!.settings.setSupportZoom(false)
+        webView!!.settings.setSupportZoom(true)
+        webView!!.settings.builtInZoomControls = true
+        webView!!.settings.useWideViewPort = true
+        webView!!.settings.loadWithOverviewMode = true
         webView!!.settings.domStorageEnabled = true
 
         url = intent.getStringExtra("web_url")
-        //玩安卓bug，http无法在P访问
-        var regex = Regex("^(http://www.wanandroid.com)")
-        url = url.replace(regex,"https://www.wanandroid.com")
-        regex = Regex("http://blog.csdn.net")
-        url = url.replace(regex,"https://blog.csdn.net")
         isCollected = intent.getBooleanExtra("collect_state",false)
         val id = intent.getLongExtra("id",-1)
         if (isCollected) article_collect_btn.setImageDrawable(resources.getDrawable(R.drawable.pic_collected_art,theme))
@@ -88,8 +87,14 @@ class CommonWebViewActivity: AppCompatActivity(){
                 Log.e(TAG,"onReceiveError $errorResponse")
             }
 
-            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                return true
+            /**
+             * 兼容低版本
+             * return true if the host application wants to leave the current WebView
+             * and handle the url itself, otherwise return false.
+             */
+            override fun shouldOverrideUrlLoading(view: WebView?,url: String): Boolean {
+                Log.i(TAG,"shouldOverrideUrlLoading $url")
+                return false // false交由系统去拦截处理url
             }
 
             override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {

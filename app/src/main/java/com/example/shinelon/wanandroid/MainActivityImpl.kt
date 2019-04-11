@@ -328,7 +328,6 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         if (mWindow == null) mWindow = hotWindow
         hotWindow.width = WindowManager.LayoutParams.MATCH_PARENT
         hotWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
-        hotWindow.isErrorViewShow(list.isEmpty())
 
         launch(UI) {
             val result = async {
@@ -337,10 +336,13 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             }.await()
 
             hotWindow.addTitle("搜索热词")
+            hotWindow.isErrorViewShow(list.isEmpty())
             list.forEach {
                 hotWindow.addWord(it)
             }
+
             hotWindow.addTitle("猜你想搜")
+            hotWindow.isErrorViewShow(result.isEmpty())
             result.forEach {
                 hotWindow.addWord(it)
             }
