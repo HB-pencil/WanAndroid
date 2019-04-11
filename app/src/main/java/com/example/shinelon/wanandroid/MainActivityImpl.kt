@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
+import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -39,8 +40,10 @@ import kotlinx.coroutines.experimental.launch
 class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.OnNavigationItemSelectedListener{
     private val TAG = "MainActivityImpl"
     private var presenter: MainActivityPresenter? = null
-    private var mWindow: HotSearchPopupWin? = null
-    private var isWinShow = false
+    private var mHotWin: HotSearchPopupWin? = null
+    private var mHintWin: SearchHintWin? = null
+    private var isHotWinShow = false
+    private var isHintWinShow = false
     private var networkStateReceiver: NetWorkStateReceiver? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -223,11 +226,19 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 //TODO kmp匹配
+                if (TextUtils.isEmpty(newText)){
+                    hideHintWin()
+                    return true
+                }
+                val list = mutableListOf("11","22","33","44")
+                showHintWin(list)
                 return true
             }
+
         })
         searchView.setOnCloseListener {
             hideHotWords()
+            hideHintWin()
             false
         }
         return super.onCreateOptionsMenu(menu)
@@ -282,9 +293,10 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(Gravity.START)) {
             drawer_layout.closeDrawer(Gravity.START)
-        } else if (isWinShow) {
+        } else if (isHotWinShow || isHintWinShow) {
             hideHotWords()
-        } else {
+            hideHintWin()
+        } else{
             super.onBackPressed()
         }
     }
@@ -323,11 +335,9 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     }
 
     override fun showHotWords(list: MutableList<String>) {
-        isWinShow = true
+        isHotWinShow = true
         val hotWindow = HotSearchPopupWin(this)
-        if (mWindow == null) mWindow = hotWindow
-        hotWindow.width = WindowManager.LayoutParams.MATCH_PARENT
-        hotWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
+        if (mHotWin == null) mHotWin = hotWindow
 
         launch(UI) {
             val result = async {
@@ -349,27 +359,62 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
 
             hotWindow.showWindow(toolbar_base)
 
-            //蒙层遮罩
-            val contentView = window.decorView.findViewById<FrameLayout>(android.R.id.content)
-            contentView.setBackgroundColor(resources.getColor(R.color.mask))
+            generateMask()
             hotWindow.setOnDismissListener {
-                contentView.setBackgroundColor(Color.WHITE)
+                removeMask()
             }
 
             hotWindow.addClickListener(object : HotSearchPopupWin.HotSearchPopupWinListener {
                 override fun onClick(hotWord: String) {
-                    val intent = Intent(this@MainActivityImpl,CommomItemActivityImpl::class.java)
-                    intent.putExtra("search_key",hotWord)
-                    presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
+                    doSearch(hotWord)
                 }
             })
         }
     }
 
     override fun hideHotWords() {
-        isWinShow = false
-        mWindow?.dismiss()
-        mWindow = null
+        isHotWinShow = false
+        mHotWin?.dismiss()
+        mHotWin = null
+    }
+
+    override fun showHintWin(list: MutableList<String>) {
+        if (mHintWin == null) {
+            mHintWin = SearchHintWin(getActivityContext())
+            mHintWin?.registerListener(object: SearchHintWin.SearchHitWinListener{
+                override fun onClick(word: String) {
+                    doSearch(word)
+                }
+            })
+        }
+        generateMask()
+        isHintWinShow = true
+        mHintWin?.addHintWords(list)
+        mHintWin?.showWindow(toolbar_base)
+    }
+
+    override fun hideHintWin() {
+        removeMask()
+        mHintWin?.hideWindow()
+        isHintWinShow = false
+        mHintWin = null
+    }
+
+    fun doSearch(keyWords: String){
+        val intent = Intent(this@MainActivityImpl,CommomItemActivityImpl::class.java)
+        intent.putExtra("search_key",keyWords)
+        presenter?.jumpToTarget(ActionFlag.SEARCH,intent)
+    }
+
+    fun generateMask(){
+        //蒙层遮罩
+        val contentView = window.decorView.findViewById<FrameLayout>(android.R.id.content)
+        contentView.setBackgroundColor(resources.getColor(R.color.mask))
+    }
+
+    fun removeMask(){
+        val contentView = window.decorView.findViewById<FrameLayout>(android.R.id.content)
+        contentView.setBackgroundColor(Color.WHITE)
     }
 
     override fun onDestroy() {

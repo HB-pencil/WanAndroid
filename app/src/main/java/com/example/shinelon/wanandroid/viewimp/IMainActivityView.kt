@@ -10,4 +10,6 @@ interface IMainActivityView: IView {
     fun hideHotWords()
     fun updateHeaderView(isOnline: Boolean,name: String?)
     fun getOnlineState(): Boolean
+    fun showHintWin(list: MutableList<String>)
+    fun hideHintWin()
 }

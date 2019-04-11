@@ -1,4 +1,4 @@
-package com.example.shinelon.wanandroid.fragment
+package com.example.shinelon.wanandroid.helper
 
 import android.content.Context
 import android.graphics.Color
@@ -7,19 +7,21 @@ import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import android.widget.LinearLayout.LayoutParams
 import com.example.shinelon.wanandroid.R
 import com.example.shinelon.wanandroid.customview.FlowLayout
 import com.example.shinelon.wanandroid.utils.dpToPx
 import com.example.shinelon.wanandroid.utils.getRandomColor
-import kotlinx.android.synthetic.main.hot_search_window.view.*
 
 class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClickListener {
     var container: FlowLayout? = null
     var listener: HotSearchPopupWinListener? = null
 
     init {
+        width = WindowManager.LayoutParams.MATCH_PARENT
+        height = WindowManager.LayoutParams.WRAP_CONTENT
         //inflate进来的view要注意它自身的约束是否有效，通常把它放进父容器
         contentView = LayoutInflater.from(context).inflate(R.layout.hot_search_window,null,true)
         setBackgroundDrawable(ColorDrawable(Color.WHITE))
