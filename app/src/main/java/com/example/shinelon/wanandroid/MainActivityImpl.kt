@@ -45,6 +45,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
     private var isHotWinShow = false
     private var isHintWinShow = false
     private var networkStateReceiver: NetWorkStateReceiver? = null
+    private var cacheList = mutableListOf<String>()
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -220,21 +221,28 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
             override fun onQueryTextSubmit(query: String?): Boolean {
                 val intent = Intent(this@MainActivityImpl, CommomItemActivityImpl::class.java)
                 intent.putExtra("search_key", query)
+                presenter?.saveOrUpdateKeyWords(query)
                 presenter?.jumpToTarget(ActionFlag.SEARCH, intent)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                //TODO kmp匹配
                 if (TextUtils.isEmpty(newText)){
                     hideHintWin()
                     return true
                 }
-                val list = mutableListOf("11","22","33","44")
-                showHintWin(list)
+                launch(UI) {
+                    val list = async {
+                        // 用set是为了去重
+                        val source = hashSetOf<String>()
+                        cacheList.forEach { source.add(it) }
+                        val res = presenter?.getMatchList(source,newText!!) ?: mutableListOf()
+                        res
+                    }.await()
+                    showHintWin(list)
+                }
                 return true
             }
-
         })
         searchView.setOnCloseListener {
             hideHotWords()
@@ -338,19 +346,22 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         isHotWinShow = true
         val hotWindow = HotSearchPopupWin(this)
         if (mHotWin == null) mHotWin = hotWindow
+        cacheList.clear()
 
         launch(UI) {
             val result = async {
-                //TODO topN算法
-                listOf("test1","test2","test3","test4","test5","test6","test7","test8","test9","test10")
+                val res = presenter?.getTopWords() ?: mutableListOf()
+                res
             }.await()
 
-            hotWindow.addTitle("搜索热词")
+            cacheList.addAll(list)
+            cacheList.addAll(result)
+
             hotWindow.isErrorViewShow(list.isEmpty())
+            if (!list.isEmpty()) hotWindow.addTitle("搜索热词")
             list.forEach {
                 hotWindow.addWord(it)
             }
-
             hotWindow.addTitle("猜你想搜")
             hotWindow.isErrorViewShow(result.isEmpty())
             result.forEach {

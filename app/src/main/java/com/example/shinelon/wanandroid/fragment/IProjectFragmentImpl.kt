@@ -56,6 +56,7 @@ class IProjectFragmentImpl:BaseFragment(),IProjectFragmentView{
             text.layoutParams = p
             text.gravity = Gravity.CENTER
             text.textSize = 18F
+            text.setAllCaps(false)
             text.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             text.setTextColor(Color.BLACK)
             text.setPadding(20,10,20,10)

@@ -55,6 +55,7 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
             title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             title.layoutParams = params
             title.text = it.name
+            title.setAllCaps(false)
             flowLayout?.addView(title)
 
             it.articles.forEach {
@@ -68,6 +69,7 @@ class INavigateFragmentImpl: BaseFragment(),INavigateFragmentView {
                 text.setTextColor(getRandomColor())
                 text.setPadding(15,10,15,10)
                 text.setBackgroundColor(Color.TRANSPARENT)
+                text.setAllCaps(false)
                 flowLayout?.addView(text)
                 val url = it.link
                 text.setOnClickListener { view -> presenter?.loadWeb(url)}

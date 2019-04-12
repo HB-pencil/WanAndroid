@@ -10,7 +10,7 @@ class WordsSQLiteHelper(context: Context,version: Int): SQLiteOpenHelper(context
     val TAG = "WordsSQLiteHelper"
     val CREATE_TABLE = "create table ${DataBase.TABLE_NAME} " +
             "(words varchar(50) primary key," +
-            "times Integer not null)"
+            "times integer not null)"
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(CREATE_TABLE)
         Log.d(TAG,"数据库表建立")

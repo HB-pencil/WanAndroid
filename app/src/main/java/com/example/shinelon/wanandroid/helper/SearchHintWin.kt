@@ -37,6 +37,7 @@ class SearchHintWin(val context: Context): PopupWindow(context) {
             word.background = context.resources.getDrawable(R.drawable.ripple_struct)
             word.gravity = Gravity.CENTER
             word.text = it
+            word.setAllCaps(false)
             container?.addView(word)
             val key = it
             word.setOnClickListener {

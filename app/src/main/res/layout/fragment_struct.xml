@@ -12,6 +12,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/general"
+            app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
             app:tabMode="scrollable"
             app:tabGravity="fill"
             app:tabSelectedTextColor="@color/red"

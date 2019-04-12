@@ -47,6 +47,7 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
         container!!.addView(text)
         text.setTextColor(Color.BLACK)
         text.isClickable = false
+        text.setAllCaps(false)
     }
 
     fun addWord(word: String){
@@ -64,6 +65,7 @@ class HotSearchPopupWin(val context: Context): PopupWindow(context),View.OnClick
         container!!.addView(text)
         text.setTextColor(getRandomColor())
         text.textSize = 14F
+        text.setAllCaps(false)
         text.setOnClickListener (this)
     }
 

@@ -1,31 +1,38 @@
 package com.example.shinelon.wanandroid.presenter
 
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteException
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.shinelon.wanandroid.LoginActivityImpl
+import com.example.shinelon.wanandroid.MyApplication
 import com.example.shinelon.wanandroid.UserInfo
 import com.example.shinelon.wanandroid.fragment.CommonDialogListener
 import com.example.shinelon.wanandroid.helper.ActionFlag
+import com.example.shinelon.wanandroid.helper.DataBase
 import com.example.shinelon.wanandroid.helper.RetrofitClient
-import com.example.shinelon.wanandroid.utils.toast
+import com.example.shinelon.wanandroid.helper.WordsSQLiteHelper
+import com.example.shinelon.wanandroid.modle.Entry
 import com.example.shinelon.wanandroid.modle.HotWord
 import com.example.shinelon.wanandroid.networkimp.FirstPageRetrofit
 import com.example.shinelon.wanandroid.networkimp.LogInOutRetrofit
-import com.example.shinelon.wanandroid.utils.NetWorkUtils
-import com.example.shinelon.wanandroid.utils.PreferenceUtils
+import com.example.shinelon.wanandroid.utils.*
 import com.example.shinelon.wanandroid.viewimp.IMainActivityView
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
+import java.sql.SQLException
 
 class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
     var view: IMainActivityView? = null
@@ -155,6 +162,20 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                 })
     }
 
+    fun getTopWords(): MutableList<String>{
+        val sqlHelper = MyApplication.getSqLiteHelper()
+        val sqlHandler = sqlHelper.writableDatabase
+        val cursor = sqlHandler.query(DataBase.TABLE_NAME,null,null, null,null,null,null)
+        val list = mutableListOf<Entry>()
+        while (cursor.moveToNext()){
+            val words = cursor.getString(0)
+            val times = cursor.getInt(1)
+            val entry = Entry(words,times)
+            list.add(entry)
+        }
+        return TopNFilter.getTopN(10,list)
+    }
+
     fun checkNetworkState(): Boolean{
         val res = NetWorkUtils.isNetWorkAvailable(view!!.getActivityContext())
         if (!res){
@@ -170,5 +191,42 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
             return false
         }
         return true
+    }
+
+    fun getMatchList(source: HashSet<String>,target: String): MutableList<String>{
+        val res = mutableListOf<String>()
+        source.forEach {
+            if(KmpMatch.isMatch(it,target)){
+                res.add(it)
+            }
+        }
+        return res
+    }
+
+    fun saveOrUpdateKeyWords(words: String?){
+        launch {
+            val sqlHelper = MyApplication.getSqLiteHelper()
+            val sqlHandler = sqlHelper.writableDatabase
+            val cursor = sqlHandler.query(DataBase.TABLE_NAME,null,"words = ?", arrayOf(words),null,null,null)
+            var times = 1
+            try {
+                if (cursor.moveToNext()) {
+                    times = cursor.getInt(1) + 1
+                    val update = "update ${DataBase.TABLE_NAME} set times = \'$times \' where words = \'$words\'"
+                    sqlHandler.execSQL(update)
+                    Log.d(TAG,"数据库更新成功！")
+                }else {
+                    //val insert = "insert into ${DataBase.TABLE_NAME}(words,times) values($words , 1)"
+                    val values = ContentValues()
+                    values.put("words",words)
+                    values.put("times",times)
+                    sqlHandler.insert(DataBase.TABLE_NAME,null,values)
+                    Log.d(TAG,"数据库插入成功！")
+                }
+            }catch (e: SQLiteException) {
+                e.printStackTrace()
+                Log.e(TAG,e.message)
+            }
+        }
     }
 }
