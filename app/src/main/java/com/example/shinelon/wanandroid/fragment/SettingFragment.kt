@@ -8,10 +8,15 @@ import android.os.Environment
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.support.design.widget.Snackbar
+import com.bumptech.glide.Glide
 import com.bumptech.glide.disklrucache.DiskLruCache
+import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.example.shinelon.wanandroid.R
+import com.example.shinelon.wanandroid.utils.getFoldSize
 import com.example.shinelon.wanandroid.utils.toast
+import kotlinx.coroutines.experimental.launch
 import java.io.File
+import java.lang.Exception
 import java.security.MessageDigest
 
 class SettingFragment: PreferenceFragment(){
@@ -52,9 +57,6 @@ class SettingFragment: PreferenceFragment(){
             if(intent.resolveActivity(activity.packageManager)!=null) startActivity(intent)
             false
         }
-
-        val file = getDiskCach()
-        cache = DiskLruCache.open(file,1,1,1*1024*1024*10)//第三个参数一个key对应多少文件
         updateCache()
         //待补充,edit(key)后newOutputStream写入之后commit或者abort，最后flush
     }
@@ -79,18 +81,18 @@ class SettingFragment: PreferenceFragment(){
     }
 
     fun clearCache():Boolean{
-        activity.externalCacheDir
-        cache!!.delete()
-        Snackbar.make(view,"清除缓存成功", Snackbar.LENGTH_SHORT).show()
+        launch {
+            Glide.get(activity).clearDiskCache()
+            Snackbar.make(view,"清除缓存成功", Snackbar.LENGTH_SHORT).show()
+        }
         return true
     }
     fun updateCache(){
-        val size = cache!!.size()/1024/1024F
-        activity.externalCacheDirs
+        val size = getFoldSize(File("${activity.cacheDir} /${InternalCacheDiskCacheFactory.DEFAULT_DISK_CACHE_DIR}"))
         cachePref = findPreference("clear")
-        cachePref?.summary = "缓存大小为${size}M"
     }
 
+    /**
     fun urlToMd5Key(url: String): String{
         val message = MessageDigest.getInstance("MD5")
         message.update(url.toByte())
@@ -106,5 +108,5 @@ class SettingFragment: PreferenceFragment(){
             stringBuilder.append(str)
         }
         return stringBuilder.toString()
-    }
+    } **/
 }
