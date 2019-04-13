@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.example.shinelon.wanandroid.helper.WordsSQLiteHelper;
-import com.squareup.leakcanary.LeakCanary;
 
 public class MyApplication extends Application {
     private static Context context ;
@@ -16,7 +15,6 @@ public class MyApplication extends Application {
         context = getApplicationContext();
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         sqLiteHelper =  new WordsSQLiteHelper(context,1);
-        LeakCanary.install(this);
     }
 
     public static Context getAppContext(){
