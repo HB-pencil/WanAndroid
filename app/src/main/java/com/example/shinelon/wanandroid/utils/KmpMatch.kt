@@ -1,21 +1,30 @@
 package com.example.shinelon.wanandroid.utils
 
+import android.util.Log
+import java.lang.Exception
+
 class KmpMatch {
     companion object {
+        val TAG = "KmpMatch"
         fun isMatch(parentStr: String, childStr: String): Boolean{
-            var i = 0
-            var j = 0
-            val next = getNext(childStr.toCharArray())
-            while (i<parentStr.length && j<childStr.length) {
-                if (j == -1 || parentStr[i] == childStr[j] ||
-                        Math.abs(parentStr[i] - childStr[j]) == Math.abs('a' - 'A')) {
-                    i++
-                    j++
-                }else {
-                    j = next[j]
+            try {
+                var i = 0
+                var j = 0
+                val next = getNext(childStr.toCharArray())
+                while (i<parentStr.length && j<childStr.length) {
+                    if (j == -1 || parentStr[i] == childStr[j] ||
+                            Math.abs(parentStr[i] - childStr[j]) == Math.abs('a' - 'A')) {
+                        i++
+                        j++
+                    }else {
+                        j = next[j]
+                    }
                 }
+                return j == childStr.length
+            }catch (e: Exception){
+                Log.e(TAG,e.message)
+                return false
             }
-            return j == childStr.length
         }
 
         private fun getNext(array: CharArray): IntArray{
