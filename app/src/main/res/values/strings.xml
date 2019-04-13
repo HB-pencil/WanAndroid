@@ -45,4 +45,11 @@
     <string name="open_source">开源支持</string>
     <string name="about_details">Androider是个人基于“玩安卓”网站开放Api开发的开源学习软件，更多详细信息请点击
     “开源支持”了解</string>
+
+    <string name="rxjava">RxJava2:2.1.6</string>
+    <string name="retrofit">Retrofit2:2.3.0</string>
+    <string name="gson">Gson:2.3.0</string>
+    <string name="glide">Glide:4.6.1</string>
+    <string name="kotlin">Kotlin:1.2.2.1</string>
+    <string name="junit">Junit:4.1.2</string>
 </resources>

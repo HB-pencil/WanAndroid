@@ -8,6 +8,8 @@ import android.os.Environment
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.support.design.widget.Snackbar
+import android.view.LayoutInflater
+import android.widget.FrameLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.disklrucache.DiskLruCache
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
@@ -42,7 +44,7 @@ class SettingFragment: PreferenceFragment(){
         }
 
         findPreference("open_source").setOnPreferenceClickListener {
-            toast(activity,"暂未完善！")
+            showSupportDialog()
             false
         }
 
@@ -90,6 +92,18 @@ class SettingFragment: PreferenceFragment(){
     fun updateCache(){
         val size = getFoldSize(File("${activity.cacheDir} /${InternalCacheDiskCacheFactory.DEFAULT_DISK_CACHE_DIR}"))
         cachePref = findPreference("clear")
+    }
+
+    private fun showSupportDialog() {
+        val frameLayout = FrameLayout(activity)
+        LayoutInflater.from(activity).inflate(R.layout.dialog_bottom,frameLayout,true)
+        val dialog = AlertDialog.Builder(activity)
+                .setTitle("本App由以下开源技术支持")
+                .setView(frameLayout)
+                .setPositiveButton(android.R.string.ok,{_,_ -> Unit})
+                .create()
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
     }
 
     /**
