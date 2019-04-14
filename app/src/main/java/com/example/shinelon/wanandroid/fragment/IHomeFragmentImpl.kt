@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
@@ -185,7 +186,8 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     override fun createBannerView(mutableList: MutableList<DataBeanBanner>) {
         if (mutableList.isEmpty()) return
         mutableList.forEach {
-            val view = LayoutInflater.from(activity).inflate(R.layout.view_pager_item, null, false)
+            val frameLayout = FrameLayout(context)
+            val view = LayoutInflater.from(activity).inflate(R.layout.view_pager_item, frameLayout, false)
             view.banner_image_title.text = it.title
             Glide.with(this)
                     .load(it.imagePath)
@@ -271,8 +273,8 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     }
 
     override fun hideLoadMoreView() {
-        val loadView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1).findViewById<ImageView>(R.id.article_item_load_more)
-        loadView.visibility = View.INVISIBLE
+        val loadView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1)?.findViewById<ImageView>(R.id.article_item_load_more)
+        loadView?.visibility = View.INVISIBLE
     }
 
     override fun showLoadMoreErrorView() {
