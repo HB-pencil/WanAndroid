@@ -262,8 +262,8 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     }
 
     override fun showLoadMoreView() {
-        val loadView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1).findViewById<ImageView>(R.id.article_item_load_more)
-        loadView.visibility = View.VISIBLE
+        val loadView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1)?.findViewById<ImageView>(R.id.article_item_load_more)
+        loadView?.visibility = View.VISIBLE
     }
 
     override fun changeLoveView(isCollected: Boolean) {
@@ -278,12 +278,12 @@ class IHomeFragmentImpl : BaseFragment(), IHomeFragmentView {
     }
 
     override fun showLoadMoreErrorView() {
-        val loadErrView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1).findViewById<TextView>(R.id.article_item_load_more_error)
-        loadErrView.visibility = View.VISIBLE
+        val loadErrView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1)?.findViewById<TextView>(R.id.article_item_load_more_error)
+        loadErrView?.visibility = View.VISIBLE
     }
 
     override fun hideLoadMoreErrorView() {
-        val loadErrView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1).findViewById<TextView>(R.id.article_item_load_more_error)
-        loadErrView.visibility = View.INVISIBLE
+        val loadErrView = recyclerView!!.getChildAt(recyclerView!!.childCount - 1)?.findViewById<TextView>(R.id.article_item_load_more_error)
+        loadErrView?.visibility = View.INVISIBLE
     }
 }
