@@ -31,6 +31,11 @@ class SettingFragment: PreferenceFragment(){
             clearCache()
         }
 
+        findPreference("check").setOnPreferenceClickListener {
+            toast(activity,"暂不支持！")
+            false
+        }
+
         findPreference("about").setOnPreferenceClickListener{
             AlertDialog.Builder(activity)
                     .setTitle("关于本软件")
@@ -87,7 +92,7 @@ class SettingFragment: PreferenceFragment(){
             Glide.get(activity).clearDiskCache()
             Snackbar.make(view,"清除缓存成功", Snackbar.LENGTH_SHORT).show()
         }
-        return true
+        return false
     }
     fun updateCache(){
         val size = getFoldSize(File("${activity.cacheDir} /${InternalCacheDiskCacheFactory.DEFAULT_DISK_CACHE_DIR}"))
