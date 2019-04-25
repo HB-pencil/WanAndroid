@@ -183,6 +183,7 @@ class MainActivityPresenter : AbsPresenter<IMainActivityView>() {
                 override val uuid = System.currentTimeMillis()
                 override fun onPositiveClick() {
                     dialog?.dismiss()
+                    checkNetworkState()
                 }
                 override fun onNegativeClick() {
                     view?.getActivityContext()?.finish()
