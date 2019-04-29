@@ -2,6 +2,9 @@
 *.apk
 *.ap_
 
+# Key Store
+*.jks
+
 # Files for the ART/Dalvik VM
 *.dex
 
