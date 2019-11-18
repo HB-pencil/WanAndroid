@@ -2,6 +2,8 @@ package com.example.shinelon.wanandroid.fragment
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -16,6 +18,7 @@ import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.example.shinelon.wanandroid.R
 import com.example.shinelon.wanandroid.utils.getFoldSize
 import com.example.shinelon.wanandroid.utils.toast
+import kotlinx.android.synthetic.main.dialog_base.view.*
 import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.lang.Exception
@@ -37,14 +40,17 @@ class SettingFragment: PreferenceFragment(){
         }
 
         findPreference("about").setOnPreferenceClickListener{
-            AlertDialog.Builder(activity)
+            val view = LayoutInflater.from(activity).inflate(R.layout.dialog_base,null,true)
+            view.dialog_base_content.text = activity.resources.getString(R.string.about_details)
+            val dialog = AlertDialog.Builder(activity)
                     .setTitle("关于本软件")
-                    .setMessage(activity.resources.getString(R.string.about_details))
+                    .setView(view)
                     .setPositiveButton("好的我知道了"){
                         _,_ ->
                     }
                     .create()
-                    .show()
+            dialog.window.setBackgroundDrawable(ColorDrawable(Color.WHITE))
+            dialog.show()
             false
         }
 
@@ -90,7 +96,9 @@ class SettingFragment: PreferenceFragment(){
     fun clearCache():Boolean{
         launch {
             Glide.get(activity).clearDiskCache()
-            Snackbar.make(view,"清除缓存成功", Snackbar.LENGTH_SHORT).show()
+            val snackBar = Snackbar.make(view,"清除缓存成功", Snackbar.LENGTH_SHORT)
+            snackBar.view.setBackgroundColor(Color.WHITE)
+            snackBar.show()
         }
         return false
     }
@@ -100,14 +108,14 @@ class SettingFragment: PreferenceFragment(){
     }
 
     private fun showSupportDialog() {
-        val frameLayout = FrameLayout(activity)
-        LayoutInflater.from(activity).inflate(R.layout.dialog_bottom,frameLayout,true)
+        val view = LayoutInflater.from(activity).inflate(R.layout.dialog_bottom,null,true)
         val dialog = AlertDialog.Builder(activity)
                 .setTitle("本App由以下开源技术支持")
-                .setView(frameLayout)
-                .setPositiveButton(android.R.string.ok,{_,_ -> Unit})
+                .setView(view)
+                .setPositiveButton(android.R.string.ok){_,_ -> Unit}
                 .create()
         dialog.setCanceledOnTouchOutside(true)
+        dialog.window.setBackgroundDrawable(ColorDrawable(Color.WHITE))
         dialog.show()
     }
 

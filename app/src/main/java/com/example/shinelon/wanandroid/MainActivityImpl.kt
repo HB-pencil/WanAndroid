@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Uri
@@ -16,6 +17,7 @@ import android.support.design.widget.NavigationView
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
+import android.support.v4.os.ConfigurationCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
@@ -99,6 +101,7 @@ class MainActivityImpl : AppCompatActivity(), IMainActivityView, NavigationView.
         setContentView(R.layout.activity_base)
         setSupportActionBar(toolbar_base)
         supportActionBar?.title = FragmentTag.HOME.tag
+        Configuration.UI_MODE_NIGHT_MASK
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar_base, R.string.open_navigation, R.string.close_navigation)
         drawer_layout.addDrawerListener(toggle)
